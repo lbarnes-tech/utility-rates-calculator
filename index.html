@@ -475,15 +475,15 @@
 
                             <div v-show="flatElectricalUsage" class="form-group">
                                 <label>Usage (kWh)</label>
-                                <input type="number" v-model.number="flatUsage" placeholder="800">
+                                <input type="number" v-model.number="flatUsage" placeholder="4000" v-on:change="refreshCharts">
                             </div>
                             <div class="form-group" v-show="tieredElectricalUsage">
                                 <label>Peak Usage (kWh)</label>
-                                <input type="number" v-model.number="peakUsage" placeholder="400">
+                                <input type="number" v-model.number="peakUsage" placeholder="1000"  v-on:change="refreshCharts">
                             </div>
                             <div class="form-group" v-show="tieredElectricalUsage">
                                 <label>Off-Peak Usage (kWh)</label>
-                                <input type="number" v-model.number="offPeakUsage" placeholder="400">
+                                <input type="number" v-model.number="offPeakUsage" placeholder="3000"  v-on:change="refreshCharts">
                             </div>
                         </div>
 
@@ -500,7 +500,7 @@
                             <br>
                             <div class="form-group">
                                 <label>Usage (gallons)</label>
-                                <input type="number" v-model.number="waterUsage" placeholder="5000">
+                                <input type="number" v-model.number="waterUsage" placeholder="3000"  v-on:change="refreshCharts">
                                 <div class="help-text">If you use, for example, 9,000 gallons, the first 6,000 are
                                     billed at Tier 1, and the remaining 3,000 are billed at Tier 2.</div>
                             </div>
@@ -716,11 +716,11 @@
                     location: 'inside',
                     houseType: 'pays_stormwater',
                     houseSize: 'tier1',
-                    flatUsage: 800,
+                    flatUsage: 4000,
                     salesTax: 0.07,
-                    peakUsage: 400,
-                    offPeakUsage: 400,
-                    waterUsage: 5000,
+                    peakUsage: 1000,
+                    offPeakUsage: 3000,
+                    waterUsage: 3000,
                     baseChart: null,
                     meteredChart: null,
                     usageChart: null
@@ -875,18 +875,6 @@
                     this.refreshCharts();
                 },
                 houseSize(newHouseSize, oldHouseSize) {
-                    this.refreshCharts();
-                },
-                flatUsage(newFlatUsage, oldFlatUsage) {
-                    this.refreshCharts();
-                },
-                peakUsage(newPeakUsage, oldPeakUsage) {
-                    this.refreshCharts();
-                },
-                offPeakUsage(newOffPeakUsage, oldOffPeakUsage) {
-                    this.refreshCharts();
-                },
-                waterUsage(newWaterUsage, oldWaterUsage) {
                     this.refreshCharts();
                 }
             },
