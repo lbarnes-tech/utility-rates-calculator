@@ -221,9 +221,10 @@
         }
 
         .help-text {
-            font-size: 0.75rem;
+            font-size: .8rem;
+            font-style: italic;
             color: #6b7280;
-            margin-top: 0.25rem;
+            padding: 0.25rem 0 .75rem 0;
         }
 
         .results-section {
@@ -377,8 +378,10 @@
                         Review</a> page for information about the transitional bills in July, August, and September of
                     2024.</p>
                 <p>
-                    There are nuances such as solar usage and time-of-year-based, usage-based electricity billing prior
-                    to Fiscal Year 2022 that are not fully captured here.
+                    There are nuances such as solar usage, the highest tier of stormwater fee, and time-of-year-based,
+                    usage-based electricity billing prior
+                    to Fiscal Year 2022 that are not fully captured here. If this tool gets a lot of traction or I get
+                    more time, I will look at adding those.
                 </p>
                 <p>
                     I mostly made this because going through and mapping the utility bill to usage and rates was tricky,
@@ -438,14 +441,16 @@
                                 <div class="help-text">Only single family detached homes, duplexes, and manufactured
                                     homes on individual lots pay stormwater fees.</div>
                                 <div v-if="houseType === 'pays_stormwater'">
-                                    <label>House Size</label>
+                                    <label>Impermeable Surface Size (House Footprint, Garage Footprint, Patio,
+                                        etc.)</label>
                                     <select v-model="houseSize">
                                         <option value="tier1">400-1,500 square feet</option>
                                         <option value="tier2">1,500-3,000 square feet</option>
                                         <option value="tier3">3,000-4,000 square feet</option>
                                         <option value="tier4">&gt;4,000 square feet</option>
                                     </select>
-                                    <div class="help-text">Tiered rates based on house square footage.</div>
+                                    <div class="help-text">Tiered rates based on impermeable surface square footage.
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -457,7 +462,9 @@
                                 </svg>
                                 Electric Usage
                             </h3>
-
+                            <p>Enter what is under the <strong>Usage</strong> column for the <strong>Electric
+                                </strong>row on your bill.</p>
+                            <br>
                             <div class="form-group">
                                 <label>Usage Type</label>
                                 <select v-model="usageType">
@@ -488,12 +495,14 @@
                                 </svg>
                                 Water Usage
                             </h3>
-
+                            <p>Enter what is under the <strong>Usage</strong> column for the <strong>Water </strong>row
+                                on your bill. Water usage is used for both water and sewer calculations.</p>
+                            <br>
                             <div class="form-group">
                                 <label>Usage (gallons)</label>
                                 <input type="number" v-model.number="waterUsage" placeholder="5000">
-                                <div class="help-text">Tiered rates: 0-6,000 gal (Tier 1), 6,001-12,000 gal (Tier 2),
-                                    12,001+ gal (Tier 3)</div>
+                                <div class="help-text">If you use, for example, 9,000 gallons, the first 6,000 are
+                                    billed at Tier 1, and the remaining 3,000 are billed at Tier 2.</div>
                             </div>
                         </div>
 
@@ -694,14 +703,14 @@
             data() {
                 return {
                     rateData: [
-                        { year: '2018', electricBase: 14.81, electricRate: 0.1012, electricRatePeak: 0.2656, electricRateOffPeak: 0.0626, waterBase: { inside: 5.54, outside: 11.08 }, waterTier1: 4.19, waterTier2: 4.82, waterTier3: 6.49, sewerBase: { inside: 9.09, outside: 20.08 }, sewerRate: 6.50, garbage: 8.30, recycling: 3.44, yardWaste: 7.83, stormwater: { tier1: 0, tier2: 0, tier3: 0, tier4: 0 } },
-                        { year: '2019', electricBase: 15.05, electricRate: 0.1029, electricRatePeak: 0.2700, electricRateOffPeak: 0.0636, waterBase: { inside: 5.54, outside: 11.08 }, waterTier1: 4.19, waterTier2: 4.82, waterTier3: 6.49, sewerBase: { inside: 9.46, outside: 20.08 }, sewerRate: 6.76, garbage: 8.51, recycling: 4.28, yardWaste: 7.83, stormwater: { tier1: 0, tier2: 0, tier3: 0, tier4: 0 } },
-                        { year: '2020', electricBase: 15.05, electricRate: 0.1029, electricRatePeak: 0.2700, electricRateOffPeak: 0.0636, waterBase: { inside: 5.54, outside: 11.08 }, waterTier1: 4.19, waterTier2: 4.82, waterTier3: 6.49, sewerBase: { inside: 9.89, outside: 20.08 }, sewerRate: 7.06, garbage: 8.72, recycling: 4.89, yardWaste: 7.83, stormwater: { tier1: 0, tier2: 0, tier3: 0, tier4: 0 } },
-                        { year: '2021', electricBase: 15.05, electricRate: 0.1029, electricRatePeak: 0.2700, electricRateOffPeak: 0.0636, waterBase: { inside: 5.54, outside: 11.08 }, waterTier1: 4.19, waterTier2: 4.82, waterTier3: 6.49, sewerBase: { inside: 10.04, outside: 20.08 }, sewerRate: 7.17, garbage: 8.94, recycling: 4.98, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
-                        { year: '2022', electricBase: 25.00, electricRate: 0.0942, electricRatePeak: 0.195, electricRateOffPeak: 0.0518, waterBase: { inside: 6.00, outside: 12 }, waterTier1: 4.25, waterTier2: 4.89, waterTier3: 6.59, sewerBase: { inside: 10.75, outside: 24.18 }, sewerRate: 7.45, garbage: 9.61, recycling: 4.55, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
-                        { year: '2023', electricBase: 26.38, electricRate: 0.0994, electricRatePeak: 0.2057, electricRateOffPeak: 0.0546, waterBase: { inside: 6.00, outside: 12 }, waterTier1: 4.42, waterTier2: 5.09, waterTier3: 6.85, sewerBase: { inside: 11.18, outside: 24.18 }, sewerRate: 7.75, garbage: 9.61, recycling: 5.24, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
-                        { year: '2024', electricBase: 26.50, electricRate: 0.1133, electricRatePeak: 0.2345, electricRateOffPeak: 0.0623, waterBase: { inside: 6.24, outside: 12.48 }, waterTier1: 4.6, waterTier2: 5.29, waterTier3: 7.13, sewerBase: { inside: 11.63, outside: 24.18 }, sewerRate: 8.06, garbage: 10.1, recycling: 5.34, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
-                        { year: '2025', electricBase: 28.00, electricRate: 0.1178, electricRatePeak: 0.2439, electricRateOffPeak: 0.0648, waterBase: { inside: 6.49, outside: 12.98 }, waterTier1: 4.78, waterTier2: 5.50, waterTier3: 7.41, sewerBase: { inside: 12.09, outside: 24.18 }, sewerRate: 8.38, garbage: 10.35, recycling: 5.44, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } }
+                        { year: 'FY 2018-19', electricBase: 14.81, electricRate: 0.1012, electricRatePeak: 0.2656, electricRateOffPeak: 0.0626, waterBase: { inside: 5.54, outside: 11.08 }, waterTier1: 4.19, waterTier2: 4.82, waterTier3: 6.49, sewerBase: { inside: 9.09, outside: 18.18 }, sewerRate: 6.50, garbage: 8.30, recycling: 3.44, yardWaste: 7.83, stormwater: { tier1: 0, tier2: 0, tier3: 0, tier4: 0 } },
+                        { year: 'FY 2019-20', electricBase: 15.05, electricRate: 0.1029, electricRatePeak: 0.2700, electricRateOffPeak: 0.0636, waterBase: { inside: 5.54, outside: 11.08 }, waterTier1: 4.19, waterTier2: 4.82, waterTier3: 6.49, sewerBase: { inside: 9.46, outside: 18.91 }, sewerRate: 6.76, garbage: 8.51, recycling: 4.28, yardWaste: 7.83, stormwater: { tier1: 0, tier2: 0, tier3: 0, tier4: 0 } },
+                        { year: 'FY 2020-21', electricBase: 15.05, electricRate: 0.1029, electricRatePeak: 0.2700, electricRateOffPeak: 0.0636, waterBase: { inside: 5.54, outside: 11.08 }, waterTier1: 4.19, waterTier2: 4.82, waterTier3: 6.49, sewerBase: { inside: 9.89, outside: 19.76 }, sewerRate: 7.06, garbage: 8.72, recycling: 4.89, yardWaste: 7.83, stormwater: { tier1: 0, tier2: 0, tier3: 0, tier4: 0 } },
+                        { year: 'FY 2021-22', electricBase: 15.05, electricRate: 0.1029, electricRatePeak: 0.2700, electricRateOffPeak: 0.0636, waterBase: { inside: 5.54, outside: 11.08 }, waterTier1: 4.19, waterTier2: 4.82, waterTier3: 6.49, sewerBase: { inside: 10.04, outside: 20.08 }, sewerRate: 7.17, garbage: 8.94, recycling: 4.98, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
+                        { year: 'FY 2022-23', electricBase: 25.00, electricRate: 0.0942, electricRatePeak: 0.195, electricRateOffPeak: 0.0518, waterBase: { inside: 6.00, outside: 12 }, waterTier1: 4.25, waterTier2: 4.89, waterTier3: 6.59, sewerBase: { inside: 10.75, outside: 21.50 }, sewerRate: 7.45, garbage: 9.61, recycling: 4.55, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
+                        { year: 'FY 2023-24', electricBase: 26.38, electricRate: 0.0994, electricRatePeak: 0.2057, electricRateOffPeak: 0.0546, waterBase: { inside: 6.00, outside: 12 }, waterTier1: 4.42, waterTier2: 5.09, waterTier3: 6.85, sewerBase: { inside: 11.18, outside: 22.36 }, sewerRate: 7.75, garbage: 9.61, recycling: 5.24, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
+                        { year: 'FY 2024-25', electricBase: 26.50, electricRate: 0.1133, electricRatePeak: 0.2345, electricRateOffPeak: 0.0623, waterBase: { inside: 6.24, outside: 12.48 }, waterTier1: 4.6, waterTier2: 5.29, waterTier3: 7.13, sewerBase: { inside: 11.63, outside: 23.26 }, sewerRate: 8.06, garbage: 10.1, recycling: 5.34, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
+                        { year: 'FY 2025-26', electricBase: 28.00, electricRate: 0.1178, electricRatePeak: 0.2439, electricRateOffPeak: 0.0648, waterBase: { inside: 6.49, outside: 12.98 }, waterTier1: 4.78, waterTier2: 5.50, waterTier3: 7.41, sewerBase: { inside: 12.09, outside: 24.19 }, sewerRate: 8.38, garbage: 10.35, recycling: 5.44, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } }
                     ],
                     usageType: 'flat',
                     location: 'inside',
@@ -796,7 +805,7 @@
                     if (this.usageType === 'flat') {
                         return `$${this.currentRates.electricBase.toFixed(2)} + $${(this.flatUsage * this.currentRates.electricRate).toFixed(2)} (${this.flatUsage} kWh × $${this.currentRates.electricRate.toFixed(4)}/kWh)`;
                     } else {
-                        return `$${this.currentRates.electricBase.toFixed(2)} + $${(this.peakUsage * this.currentRates.peakRate + this.offPeakUsage * this.currentRates.offPeakRate).toFixed(2)} (${this.peakUsage} kWh × $${this.currentRates.electricRatePeak.toFixed(4)}/kWh) + (${this.offPeakUsage} kWh × $${this.currentRates.electricRateOffPeak.toFixed(3)}/kWh)`;
+                        return `$${this.currentRates.electricBase.toFixed(2)} + $${(this.peakUsage * this.currentRates.electricRatePeak)} (${this.peakUsage} kWh × $${this.currentRates.electricRatePeak.toFixed(4)}/kWh) + $${(this.offPeakUsage * this.currentRates.electricRateOffPeak).toFixed(2)} (${this.offPeakUsage} kWh × $${this.currentRates.electricRateOffPeak.toFixed(3)}/kWh)`;
                     }
                 },
                 salesTaxEquation() {
@@ -866,6 +875,18 @@
                     this.refreshCharts();
                 },
                 houseSize(newHouseSize, oldHouseSize) {
+                    this.refreshCharts();
+                },
+                flatUsage(newFlatUsage, oldFlatUsage) {
+                    this.refreshCharts();
+                },
+                peakUsage(newPeakUsage, oldPeakUsage) {
+                    this.refreshCharts();
+                },
+                offPeakUsage(newOffPeakUsage, oldOffPeakUsage) {
+                    this.refreshCharts();
+                },
+                waterUsage(newWaterUsage, oldWaterUsage) {
                     this.refreshCharts();
                 }
             },
