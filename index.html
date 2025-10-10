@@ -368,6 +368,7 @@
                 <h3>
                     This webpage is not affiliated with, created by, or endorsed by the Town of Apex.
                 </h3>
+                <p>These are all based on the town's fiscal years, which run from July to the next June.</p>
                 <p>Please see the Town of Apex's <a href='https://apexnc.org/2014/Billing-Updates'>Billing Updates</a>
                     page for the latest information about utility bills during the transition to the new billing system.
                 </p>
@@ -465,22 +466,17 @@
                                 </select>
                             </div>
 
-                            <div v-if="usageType === 'flat'" class="form-group">
+                            <div v-show="flatElectricalUsage" class="form-group">
                                 <label>Usage (kWh)</label>
                                 <input type="number" v-model.number="flatUsage" placeholder="800">
                             </div>
-
-                            <div v-else>
-                                <div class="form-group">
-                                    <label>Peak Usage (kWh)</label>
-                                    <input type="number" v-model.number="peakUsage" placeholder="400">
-                                    <div class="help-text">Rate: $<span>{{ peakRate.toFixed(3) }}</span>/kWh</div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Off-Peak Usage (kWh)</label>
-                                    <input type="number" v-model.number="offPeakUsage" placeholder="400">
-                                    <div class="help-text">Rate: $<span>{{ offPeakRate.toFixed(3) }}</span>/kWh</div>
-                                </div>
+                            <div class="form-group" v-show="tieredElectricalUsage">
+                                <label>Peak Usage (kWh)</label>
+                                <input type="number" v-model.number="peakUsage" placeholder="400">
+                            </div>
+                            <div class="form-group" v-show="tieredElectricalUsage">
+                                <label>Off-Peak Usage (kWh)</label>
+                                <input type="number" v-model.number="offPeakUsage" placeholder="400">
                             </div>
                         </div>
 
@@ -616,8 +612,14 @@
             <div class="rate-info">
                 <h4>Current Rates (2025)</h4>
                 <div class="rate-info-list">
-                    <div>Electric: $<span>{{ currentRates.electricBase.toFixed(2) }}</span>/bill + $<span>{{
+                    <div v-show="flatElectricalUsage">Electric: $<span>{{ currentRates.electricBase.toFixed(2)
+                            }}</span>/bill + $<span>{{
                             currentRates.electricRate.toFixed(4) }}</span>/kWh</div>
+                    <div v-show="tieredElectricalUsage">Electric: $<span>{{ currentRates.electricBase.toFixed(2)
+                            }}</span>/bill + $<span>{{
+                            currentRates.electricRatePeak.toFixed(4) }}</span>/kWh (Peak) + $<span>{{
+                            currentRates.electricRateOffPeak.toFixed(4) }}</span>/kWh (Off-Peak) </div>
+                    <div>Electricity Sales Tax: <span>{{ (this.salesTax*100).toFixed(0) }}%</span></div>
                     <div>Water: $<span>{{ this.location == 'inside' ? currentRates.waterBase.inside.toFixed(2) :
                             currentRates.waterBase.outside.toFixed(2) }}</span>/bill + Tier 1 (0-6k gal):
                         $<span>{{ currentRates.waterTier1.toFixed(2) }}</span>/kgal</div>
@@ -716,6 +718,12 @@
                 };
             },
             computed: {
+                flatElectricalUsage() {
+                    return this.usageType === 'flat';
+                },
+                tieredElectricalUsage() {
+                    return this.usageType === 'tiered';
+                },
                 currentRates() {
                     return this.rateData[this.rateData.length - 1];
                 },
@@ -814,7 +822,7 @@
                     return `$${base} + $${((this.waterUsage / 1000) * this.currentRates.sewerRate).toFixed(2)}  (${(this.waterUsage / 1000).toFixed(2)} kgal × $${this.currentRates.sewerRate.toFixed(2)}/kgal)`;
                 },
                 garbageEquation() {
-                    return `$${this.currentRates.garbage.toFixed(2)} (flat fee per can, per bill)`;
+                    return `$${this.currentRates.garbage.toFixed(2)} (flat fee per bill)`;
                 },
                 recyclingEquation() {
                     return `$${this.currentRates.recycling.toFixed(2)} (flat fee per bill)`;
@@ -846,7 +854,28 @@
             mounted() {
                 this.createCharts();
             },
+            watch: {
+                // whenever question changes, this function will run
+                usageType(newUsageType, oldUsageType) {
+                    this.refreshCharts();
+                },
+                location(newLocation, oldLocation) {
+                    this.refreshCharts();
+                },
+                houseType(newHouseType, oldHouseType) {
+                    this.refreshCharts();
+                },
+                houseSize(newHouseSize, oldHouseSize) {
+                    this.refreshCharts();
+                }
+            },
             methods: {
+                refreshCharts() {
+                    this.meteredChart.destroy();
+                    this.baseChart.destroy();
+                    this.usageChart.destroy();
+                    this.createCharts();
+                },
                 createCharts() {
                     const years = this.rateData.map(d => d.year);
                     // Base Rates Chart
@@ -868,7 +897,7 @@
                                     data: this.location == 'inside' ? this.rateData.map(d => d.waterBase.inside) : this.rateData.map(d => d.waterBase.outside),
                                     borderColor: '#3b82f6',
                                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                    tension: 0
+                                    tension: 0,
                                 },
                                 {
                                     label: 'Sewer',
@@ -913,6 +942,21 @@
                             plugins: {
                                 legend: {
                                     position: 'bottom'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            let label = context.dataset.label || '';
+
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.y !== null) {
+                                                label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                            }
+                                            return label;
+                                        }
+                                    }
                                 }
                             },
                             scales: {
@@ -935,11 +979,27 @@
                             labels: years,
                             datasets: [
                                 {
-                                    label: 'Electric ($/kWh)',
+                                    label: 'Electric Flat Rate ($/kWh)',
                                     data: this.rateData.map(d => d.electricRate),
                                     borderColor: '#f59e0b',
                                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
                                     tension: 0
+                                },
+                                {
+                                    label: 'Electric Peak Rate ($/kWh)',
+                                    data: this.rateData.map(d => d.electricRatePeak),
+                                    borderColor: '#f59e0b',
+                                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                    tension: 0,
+                                    borderDash: [5, 5]
+                                },
+                                {
+                                    label: 'Electric Off-Peak Rate ($/kWh)',
+                                    data: this.rateData.map(d => d.electricRateOffPeak),
+                                    borderColor: '#f59e0b',
+                                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                    tension: 0,
+                                    borderDash: [2, 2]
                                 },
                                 {
                                     label: 'Water Tier 1 ($/kgal)',
@@ -979,6 +1039,21 @@
                             plugins: {
                                 legend: {
                                     position: 'bottom'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            let label = context.dataset.label || '';
+
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.y !== null) {
+                                                label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                            }
+                                            return label;
+                                        }
+                                    }
                                 }
                             },
                             scales: {
@@ -1046,6 +1121,21 @@
                             plugins: {
                                 legend: {
                                     position: 'bottom'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            let label = context.dataset.label || '';
+
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.y !== null) {
+                                                label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                            }
+                                            return label;
+                                        }
+                                    }
                                 }
                             },
                             scales: {
