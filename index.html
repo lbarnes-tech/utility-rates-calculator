@@ -265,10 +265,11 @@
 
         .bill-label {
             font-weight: 500;
+            font-size: 1.15rem;
         }
 
         .bill-amount {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             font-weight: bold;
         }
 
@@ -289,11 +290,11 @@
         }
 
         .equation-box {
-            background: white;
             border-radius: 0.5rem;
-            padding: 0.75rem;
+            padding: 0.75rem 0;
             font-family: 'Courier New', monospace;
-            font-size: 0.875rem;
+            font-size: 1rem;
+            font-weight: 600;
             color: #374151;
             overflow-x: auto;
         }
@@ -433,12 +434,12 @@
                                     limits.</div>
                                 <label>House Type</label>
                                 <select v-model="houseType">
-                                    <option value="pays_stormwater">Single Family Detached, Duplex, Manufactured Home on
+                                    <option value="pays_stormwater">Single Family Detached, Townhome, Duplex, Manufactured Home on
                                         Individual Lot</option>
-                                    <option value="no_stormwater">Townhome, Apartment, Condo, Manufactured Home on
+                                    <option value="no_stormwater">Apartment, Condo, Manufactured Home on
                                         Shared Lot, Other</option>
                                 </select>
-                                <div class="help-text">Only single family detached homes, duplexes, and manufactured
+                                <div class="help-text">Only single family detached homes, townhomes, duplexes, and manufactured
                                     homes on individual lots pay stormwater fees.</div>
                                 <div v-if="houseType === 'pays_stormwater'">
                                     <label>Impermeable Surface Size (House Footprint, Garage Footprint, Patio,
@@ -449,7 +450,12 @@
                                         <option value="tier3">3,000-4,000 square feet</option>
                                         <option value="tier4">&gt;4,000 square feet</option>
                                     </select>
-                                    <div class="help-text">Tiered rates based on impermeable surface square footage.
+                                    <div class="help-text">Tiered rates based on impermeable surface square footage. To
+                                        learn more about how this is calculated, visit the Town's <a
+                                            href="https://www.apexnc.org/Faq.aspx?QID=271">Stormwater Billing FAQ</a>.
+                                        You can also enter your address in the <a
+                                            href='https://apexnc.maps.arcgis.com/apps/webappviewer/index.html?id=45f5c6fb55054fe0b4560a2a5d779665'>Stormwater
+                                            Utility Fee</a> map to get your impervious square footage.
                                     </div>
                                 </div>
                             </div>
@@ -475,15 +481,18 @@
 
                             <div v-show="flatElectricalUsage" class="form-group">
                                 <label>Usage (kWh)</label>
-                                <input type="number" v-model.number="flatUsage" placeholder="4000" v-on:change="refreshCharts">
+                                <input type="number" v-model.number="flatUsage" placeholder="4000"
+                                    v-on:change="refreshCharts">
                             </div>
                             <div class="form-group" v-show="tieredElectricalUsage">
                                 <label>Peak Usage (kWh)</label>
-                                <input type="number" v-model.number="peakUsage" placeholder="1000"  v-on:change="refreshCharts">
+                                <input type="number" v-model.number="peakUsage" placeholder="1000"
+                                    v-on:change="refreshCharts">
                             </div>
                             <div class="form-group" v-show="tieredElectricalUsage">
                                 <label>Off-Peak Usage (kWh)</label>
-                                <input type="number" v-model.number="offPeakUsage" placeholder="3000"  v-on:change="refreshCharts">
+                                <input type="number" v-model.number="offPeakUsage" placeholder="3000"
+                                    v-on:change="refreshCharts">
                             </div>
                         </div>
 
@@ -500,7 +509,8 @@
                             <br>
                             <div class="form-group">
                                 <label>Usage (gallons)</label>
-                                <input type="number" v-model.number="waterUsage" placeholder="3000"  v-on:change="refreshCharts">
+                                <input type="number" v-model.number="waterUsage" placeholder="3000"
+                                    v-on:change="refreshCharts">
                                 <div class="help-text">If you use, for example, 9,000 gallons, the first 6,000 are
                                     billed at Tier 1, and the remaining 3,000 are billed at Tier 2.</div>
                             </div>
@@ -686,10 +696,22 @@
                             stroke="currentColor" stroke-width="2">
                             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
                         </svg>
-                        Metered Rates Over Time
+                        Metered Electric Rates Over Time
                     </h2>
                     <div class="canvas-container">
-                        <canvas ref="meteredRateChart"></canvas>
+                        <canvas ref="meteredKwhRateChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>
+                        <svg class="icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                        </svg>
+                        Metered Water/Sewer Rates Over Time
+                    </h2>
+                    <div class="canvas-container">
+                        <canvas ref="meteredKgalRateChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -722,7 +744,8 @@
                     offPeakUsage: 3000,
                     waterUsage: 3000,
                     baseChart: null,
-                    meteredChart: null,
+                    meteredKwhChart: null,
+                    meteredKgalChart: null,
                     usageChart: null
                 };
             },
@@ -880,7 +903,8 @@
             },
             methods: {
                 refreshCharts() {
-                    this.meteredChart.destroy();
+                    this.meteredKgalChart.destroy();
+                    this.meteredKwhChart.destroy();
                     this.baseChart.destroy();
                     this.usageChart.destroy();
                     this.createCharts();
@@ -981,8 +1005,8 @@
                     });
 
                     // Metered Rates Chart
-                    const meteredCtx = this.$refs.meteredRateChart.getContext('2d');
-                    this.meteredChart = new Chart(meteredCtx, {
+                    const meteredKwhCtx = this.$refs.meteredKwhRateChart.getContext('2d');
+                    this.meteredKwhChart = new Chart(meteredKwhCtx, {
                         type: 'line',
                         data: {
                             labels: years,
@@ -1009,7 +1033,50 @@
                                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
                                     tension: 0,
                                     borderDash: [2, 2]
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
                                 },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            let label = context.dataset.label || '';
+
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.y !== null) {
+                                                label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Rate ($/kWh)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    const meteredKgalCtx = this.$refs.meteredKgalRateChart.getContext('2d');
+                    this.meteredKgalChart = new Chart(meteredKgalCtx, {
+                        type: 'line',
+                        data: {
+                            labels: years,
+                            datasets: [
                                 {
                                     label: 'Water Tier 1 ($/kgal)',
                                     data: this.rateData.map(d => d.waterTier1),
@@ -1070,13 +1137,12 @@
                                     beginAtZero: true,
                                     title: {
                                         display: true,
-                                        text: 'Rate ($/unit)'
+                                        text: 'Rate ($/kgallon)'
                                     }
                                 }
                             }
                         }
                     });
-
 
                     // Usage costs over time chart
                     const sameUsageCtx = this.$refs.sameUsageOverYearsChart.getContext('2d');
