@@ -289,6 +289,14 @@
             color: #059669;
         }
 
+        .stormwater-color {
+            color: #0891b2
+        }
+
+        .stormwater-background-color {
+            background-color: #0891b2
+        }
+
         .equation-box {
             border-radius: 0.5rem;
             padding: 0.75rem 0;
@@ -329,8 +337,6 @@
             opacity: 0.9;
         }
 
-
-
         .rate-info h4 {
             font-size: 1.5rem;
             font-weight: 600;
@@ -353,6 +359,31 @@
         .icon-sm {
             width: 20px;
             height: 20px;
+        }
+
+        .button-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .address-lookup {
+            display: flex;
+            flex-wrap: nowrap;
+            height: 36px;
+            align-items: center;
+            padding: 0.625rem 0px;
+        }
+
+        .gis-search-button {
+            border-radius: 0.5rem;
+            background-color: #0891b2;
+            border: 0px solid black;
+            box-shadow: none;
+            justify-items: center;
+            margin-left: 5px;
+            height: 30px;
+            width: 30px;
+            padding: auto;
         }
     </style>
 </head>
@@ -393,7 +424,9 @@
                 <p>I pulled all the fee schedules from the <a href='https://www.apexnc.org/153/Budget'>budget
                         reports</a> available on the Town of Apex website. If you have a question, or think I typoed
                     something, you can email me at lrridge (at) gmail (dot) com.</p>
-                <p>This site does not store any information - everything is calculated within the page locally.</p>
+                <p>This site does not store any information - everything is calculated within the page locally with the
+                    help of online Town resources.</p>
+
             </div>
 
             <div class="calculator-section">
@@ -434,12 +467,14 @@
                                     limits.</div>
                                 <label>House Type</label>
                                 <select v-model="houseType">
-                                    <option value="pays_stormwater">Single Family Detached, Townhome, Duplex, Manufactured Home on
+                                    <option value="pays_stormwater">Single Family Detached, Townhome, Duplex,
+                                        Manufactured Home on
                                         Individual Lot</option>
                                     <option value="no_stormwater">Apartment, Condo, Manufactured Home on
                                         Shared Lot, Other</option>
                                 </select>
-                                <div class="help-text">Only single family detached homes, townhomes, duplexes, and manufactured
+                                <div class="help-text">Only single family detached homes, townhomes, duplexes, and
+                                    manufactured
                                     homes on individual lots pay stormwater fees.</div>
                                 <div v-if="houseType === 'pays_stormwater'">
                                     <label>Impermeable Surface Size (House Footprint, Garage Footprint, Patio,
@@ -453,9 +488,27 @@
                                     <div class="help-text">Tiered rates based on impermeable surface square footage. To
                                         learn more about how this is calculated, visit the Town's <a
                                             href="https://www.apexnc.org/Faq.aspx?QID=271">Stormwater Billing FAQ</a>.
-                                        You can also enter your address in the <a
+                                    </div>
+                                    <label>Street Address</label>
+                                    <div class="address-lookup">
+                                        <input type="text" v-model="addressToCheck">
+                                        <button class="gis-search-button stormwater-background-color"
+                                            v-on:click="updateTier"><svg class="button-icon" viewBox="0 0 24 24"
+                                                fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <g>
+                                                    <path
+                                                        d="M21 21L16.6569 16.6569M16.6569 16.6569C18.1046 15.2091 19 13.2091 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C13.2091 19 15.2091 18.1046 16.6569 16.6569Z"
+                                                        stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
+                                                </g>
+
+                                            </svg></button>
+                                    </div>
+                                    <div class="help-text">This is totally optional - it just helps look up the right
+                                        tier for the menu above. You can also enter your address in the <a
                                             href='https://apexnc.maps.arcgis.com/apps/webappviewer/index.html?id=45f5c6fb55054fe0b4560a2a5d779665'>Stormwater
-                                            Utility Fee</a> map to get your impervious square footage.
+                                            Utility Fee</a> map to get your impervious square footage. This uses the
+                                        same map data.
                                     </div>
                                 </div>
                             </div>
@@ -730,14 +783,15 @@
                         { year: 'FY 2020-21', electricBase: 15.05, electricRate: 0.1029, electricRatePeak: 0.2700, electricRateOffPeak: 0.0636, waterBase: { inside: 5.54, outside: 11.08 }, waterTier1: 4.19, waterTier2: 4.82, waterTier3: 6.49, sewerBase: { inside: 9.89, outside: 19.76 }, sewerRate: 7.06, garbage: 8.72, recycling: 4.89, yardWaste: 7.83, stormwater: { tier1: 0, tier2: 0, tier3: 0, tier4: 0 } },
                         { year: 'FY 2021-22', electricBase: 15.05, electricRate: 0.1029, electricRatePeak: 0.2700, electricRateOffPeak: 0.0636, waterBase: { inside: 5.54, outside: 11.08 }, waterTier1: 4.19, waterTier2: 4.82, waterTier3: 6.49, sewerBase: { inside: 10.04, outside: 20.08 }, sewerRate: 7.17, garbage: 8.94, recycling: 4.98, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
                         { year: 'FY 2022-23', electricBase: 25.00, electricRate: 0.0942, electricRatePeak: 0.195, electricRateOffPeak: 0.0518, waterBase: { inside: 6.00, outside: 12 }, waterTier1: 4.25, waterTier2: 4.89, waterTier3: 6.59, sewerBase: { inside: 10.75, outside: 21.50 }, sewerRate: 7.45, garbage: 9.61, recycling: 4.55, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
-                        { year: 'FY 2023-24', electricBase: 26.38, electricRate: 0.0994, electricRatePeak: 0.2057, electricRateOffPeak: 0.0546, waterBase: { inside: 6.00, outside: 12 }, waterTier1: 4.42, waterTier2: 5.09, waterTier3: 6.85, sewerBase: { inside: 11.18, outside: 22.36 }, sewerRate: 7.75, garbage: 9.61, recycling: 5.24, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
-                        { year: 'FY 2024-25', electricBase: 26.50, electricRate: 0.1133, electricRatePeak: 0.2345, electricRateOffPeak: 0.0623, waterBase: { inside: 6.24, outside: 12.48 }, waterTier1: 4.6, waterTier2: 5.29, waterTier3: 7.13, sewerBase: { inside: 11.63, outside: 23.26 }, sewerRate: 8.06, garbage: 10.1, recycling: 5.34, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
-                        { year: 'FY 2025-26', electricBase: 28.00, electricRate: 0.1178, electricRatePeak: 0.2439, electricRateOffPeak: 0.0648, waterBase: { inside: 6.49, outside: 12.98 }, waterTier1: 4.78, waterTier2: 5.50, waterTier3: 7.41, sewerBase: { inside: 12.09, outside: 24.19 }, sewerRate: 8.38, garbage: 10.35, recycling: 5.44, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } }
+                        { year: 'FY 2023-24', electricBase: 26.38, electricRate: 0.0994, electricRatePeak: 0.2057, electricRateOffPeak: 0.0546, dukeElectricBase: 14, dukeElectricRate:0.122604, dukeAdditionalRate: 0.004951,waterBase: { inside: 6.00, outside: 12 }, waterTier1: 4.42, waterTier2: 5.09, waterTier3: 6.85, sewerBase: { inside: 11.18, outside: 22.36 }, sewerRate: 7.75, garbage: 9.61, recycling: 5.24, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
+                        { year: 'FY 2024-25', electricBase: 26.50, electricRate: 0.1133, electricRatePeak: 0.2345, electricRateOffPeak: 0.0623,  dukeElectricBase: 14, dukeElectricRate:0.118504, dukeAdditionalRate: 0.001381, waterBase: { inside: 6.24, outside: 12.48 }, waterTier1: 4.6, waterTier2: 5.29, waterTier3: 7.13, sewerBase: { inside: 11.63, outside: 23.26 }, sewerRate: 8.06, garbage: 10.1, recycling: 5.34, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } },
+                        { year: 'FY 2025-26', electricBase: 28.00, electricRate: 0.1178, electricRatePeak: 0.2439, electricRateOffPeak: 0.0648, dukeElectricBase: 14, dukeElectricRate:0.122604, dukeAdditionalRate: 0.004951,waterBase: { inside: 6.49, outside: 12.98 }, waterTier1: 4.78, waterTier2: 5.50, waterTier3: 7.41, sewerBase: { inside: 12.09, outside: 24.19 }, sewerRate: 8.38, garbage: 10.35, recycling: 5.44, yardWaste: 7.83, stormwater: { tier1: 1.50, tier2: 5.00, tier3: 7.50, tier4: 10.00 } }
                     ],
                     usageType: 'flat',
                     location: 'inside',
                     houseType: 'pays_stormwater',
                     houseSize: 'tier1',
+                    addressToCheck: '',
                     flatUsage: 4000,
                     salesTax: 0.07,
                     peakUsage: 1000,
@@ -746,7 +800,8 @@
                     baseChart: null,
                     meteredKwhChart: null,
                     meteredKgalChart: null,
-                    usageChart: null
+                    usageChart: null,
+                    layerURL: 'https://gis.apexnc.org/server/rest/services/WR/Impervious_Layers_Viewer/FeatureServer/0',
                 };
             },
             computed: {
@@ -908,6 +963,30 @@
                     this.baseChart.destroy();
                     this.usageChart.destroy();
                     this.createCharts();
+                },
+                updateTier() {
+                    const esc = s => s.replace(/'/g, "''");
+                    const where = `SITE_ADDRESS LIKE '%${esc(this.addressToCheck)}%' OR OWNER LIKE '%${esc(this.addressToCheck)}%' OR PIN_NUM LIKE '%${esc(this.addressToCheck)}%'`;
+                    let params = new URLSearchParams({
+                        f: "json",
+                        where,
+                        outFields: "*",
+                        returnGeometry: "false",
+                    });
+                    const url = `${this.layerURL}/query?${params.toString()}`;
+
+                    console.log(this.layerURL);
+                    console.log(params.toString());
+                    console.log(url);
+                    const response = fetch(url).then((response) => {
+                        response?.json().then((data) => {
+                            console.log(data);
+                            if (data?.features && data?.features[0] != null) {
+                                this.houseSize = 'tier' + data?.features[0]?.attributes?.TIER;
+                            }
+                        });
+                    });
+
                 },
                 createCharts() {
                     const years = this.rateData.map(d => d.year);
