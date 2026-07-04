@@ -498,7 +498,6 @@
                         href="https://www.apexnc.org/2014/Billing-Updates">town resource covers the details</a>,
                     including information about assistance programs and payment plans.</p>
                 <br />
-                <br />
                 <h4>Helpful Links</h4>
                 <p>
                 <ul>
@@ -1394,7 +1393,7 @@
                                 {
                                     label: 'Other (Garbage + Recycling + Yard Waste + Stormwater)',
                                     data: this.rateData.map(d => d.garbage + d.recycling + d.yardWaste + (this.houseType == 'no_stormwater' ? 0 : this.houseSize == 'tier1' ? d.stormwater.tier1 : this.houseSize == 'tier2' ? d.stormwater.tier2 : this.houseSize == 'tier3' ? d.stormwater.tier3 : d.stormwater.tier4)),
-                                    borderColor: '#f59e0b',
+                                    borderColor: '#df00ad',
                                     backgroundColor: 'rgba(255, 218, 245, 0.1)',
                                     tension: 0
                                 }
