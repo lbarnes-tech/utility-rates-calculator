@@ -12,126 +12,147 @@
     <script src="https://cdn.jsdelivr.net/npm/vuetify@4.1.3/dist/vuetify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
-<style> body {
+    <style>
+        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             min-height: 100vh;
-        }</style>
+        }
+
+        .graph-container {
+
+            width: 100%;
+            aspect-ratio: 3;
+        }
+    </style>
 </head>
 
 <body>
     <div id="app">
 
-        <v-app>
+        <v-app :theme="theme" :class="theme === 'light' ? 'bg-green-lighten-5' : ''">
             <v-app-bar>
                 <v-app-bar-title>Apex Utility Rate Tracker</v-app-bar-title>
+                <v-spacer></v-spacer>
+
+                <v-icon-btn :icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'" @click="onToggleTheme"
+                    class="mr-4"></v-icon-btn>
             </v-app-bar>
 
             <v-main>
-                <v-container class="justify-items-center flex-column ga-7">
-                    <h1>Apex Utility Rate Tracker</h1>
-            
-                    <h3>
-                        This webpage is not affiliated with, created by, or endorsed by the Town of Apex.
-                    </h3>
-                             <v-alert :title="`Recent Updates`"  
-                        text="The calculator has been updated with the rates for FY2026-27." type="info"
-                        variant="outlined" class="w-75 mb-8"></v-alert>
-        
-                    <p>The town is returning to standard billing procedures in July 2026. This <a
-                            href="https://www.apexnc.org/2014/Billing-Updates">town resource covers the
-                            details</a>,
-                        including information about assistance programs and payment plans.</p>
-             
-                    <h4>Helpful Links</h4>
-                    <p>
-                    <ul>
-                        <li>
-                            Electricities has a <a
-                                href="https://www.electricities.com/resource-library/temptracker-365/">TempTracker
-                                365</a> tool
-                            that shows historical temperatures in Apex. This can give more context for usage
-                            changes
-                            over time.
-                        </li>
-                        <li>Electricities also has an <a
-                                href="https://c03.apogee.net/mvc/home/hes/wi?utilityname=electricities">Energy
-                                Forecast</a>
-                            tool for looking at the week ahead, considering factors like the weather and your
-                            thermostat
-                            settings.</li>
-                            <li>Also, please refer to the Town of Apex's <a
-                                href='https://apexnc.org/2068/Third-Party-Review#'>Third
-                                Party
-                                Review</a> page for information about the transitional bills in July, August, and
-                            September
-                            of
-                            2024.</li>
-                    </ul>
-                    </p>
+                <v-container class="justify-center flex-column ga-7">
+                    <v-card flat border rounded>
+                        <v-card-item class="d-flex justify-center">
+                            <v-card-title class="text-center">Apex Utility Rate Tracker</v-card-title>
+                            <v-card-subtitle>
+                                This webpage is not affiliated with, created by, or endorsed by the Town of Apex.
+                            </v-card-subtitle>
+                        </v-card-item>
+                        <v-card-text>
+                            <v-list lines="two">
+                                <v-list-subheader>Recent Updates</v-list-subheader>
+                                <v-list-item variant="flat">
+                                    <template v-slot:prepend>
+                                        <v-avatar>
+                                            <v-icon color="cyan-darken-2" icon="mdi-new-box"></v-icon>
+                                        </v-avatar>
+                                    </template>
+                                    <v-list-item-title>
+                                        The calculator has been updated with the rates for FY2026-27.
+                                    </v-list-item-title>
+                                </v-list-item>
+                                <v-list-item variant="flat">
+                                    <template v-slot:prepend>
+                                        <v-avatar>
+                                            <v-icon color="orange-darken-2" icon="mdi-restart-alert"></v-icon>
+                                        </v-avatar>
+                                    </template>
+                                    <v-list-item-title>
+                                        The town is returning to standard billing procedures in July 2026.
+                                    </v-list-item-title>
+                                    <v-list-item-subtitle>
+                                        This <a href="https://www.apexnc.org/2014/Billing-Updates">town resource covers
+                                            the
+                                            details</a>,
+                                        including information about assistance programs and payment plans.
+                                    </v-list-item-subtitle>
+                                </v-list-item>
+                            </v-list>
 
-                  
-                 
-   
+
+                        </v-card-text>
+
+                    </v-card>
 
                 </v-container>
                 <v-container class="d-flex justify-items-center flex-column ga-5">
                     <v-row>
-                      
+
                         <v-col cols="12" md="6" key="electric">
                             <v-card class="fill-height pa-4" flat border rounded>
-                                <v-card-title class="text-center">Electric Usage</v-card-title>
+                                <v-card-item class="d-flex justify-center" prepend-icon="mdi-power-plug">
+                                    <v-card-title class="text-center">Electric Usage</v-card-title></v-card-item>
                                 <v-card-text class="pa-4 d-flex flex-column  ga-6">
                                     <p>Enter what is under the <strong>Usage</strong> column for the
                                         <strong>Electric
                                         </strong>row on your bill.
                                     </p>
-                                   
-                                  <v-select v-model="usageType" label="Usage Type"
+
+                                    <v-select v-model="usageType" label="Usage Type"
                                         :items="[{title: 'Flat Rate', value:'flat'},{title: 'Time of Use', value:'tiered'} ]"
-                                        persistent-hint :hint="`If you're not sure, select Flat Rate. Time of Use is not currently accepting new customers.`">
+                                        persistent-hint
+                                        :hint="`Not sure? Select Flat Rate. Time of Use is not currently accepting new customers.`">
                                     </v-select>
-                                      <v-number-input  v-show="flatElectricalUsage" label="Usage (kWh)" v-model.number="flatUsage" control-variant="hidden"    v-on:change="refreshCharts">
-                                        
-                                      </v-number-input> 
-                                       <v-number-input  v-show="tieredElectricalUsage" label="Peak Usage (kWh)" v-model.number="peakUsage" control-variant="hidden"    v-on:change="refreshCharts">
-                                        
-                                      </v-number-input> 
-                                       <v-number-input  v-show="tieredElectricalUsage" label="Off-Peak Usage (kWh)" v-model.number="offPeakUsage" control-variant="hidden"    v-on:change="refreshCharts">
-                                        
-                                      </v-number-input> 
-            
+                                    <v-number-input v-show="flatElectricalUsage" label="Usage (kWh)"
+                                        v-model.number="flatUsage" control-variant="hidden" v-on:change="refreshCharts">
+
+                                    </v-number-input>
+                                    <v-number-input v-show="tieredElectricalUsage" label="Peak Usage (kWh)"
+                                        v-model.number="peakUsage" control-variant="hidden" v-on:change="refreshCharts">
+
+                                    </v-number-input>
+                                    <v-number-input v-show="tieredElectricalUsage" label="Off-Peak Usage (kWh)"
+                                        v-model.number="offPeakUsage" control-variant="hidden"
+                                        v-on:change="refreshCharts">
+
+                                    </v-number-input>
+
                                 </v-card-text>
                             </v-card>
                         </v-col>
                         <v-col cols="12" md="6" key="water">
-                            <v-card  class="fill-height pa-4" flat border rounded>
-     <v-card-title class="text-center">Water Usage</v-card-title>
-<v-card-text class="pa-4 d-flex flex-column ga-6">
-                                <p>Enter what is under the <strong>Usage</strong> column for the
-                                    <strong>Water
-                                    </strong>row
-                                    on your bill. Water usage is used for both water and sewer calculations.
-                                </p>
-                         <v-select v-model="location" label="Inside or Outside Town Limits"
+                            <v-card class="fill-height pa-4" flat border rounded>
+                                <v-card-item class="d-flex justify-center" prepend-icon="mdi-water-pump">
+                                    <v-card-title>Water Usage</v-card-title></v-card-item>
+                                <v-card-text class="pa-4 d-flex flex-column ga-6">
+                                    <p>Enter what is under the <strong>Usage</strong> column for the
+                                        <strong>Water
+                                        </strong>row
+                                        on your bill.
+                                    </p>
+
+                                    <v-select v-model="location" label="Inside or Outside Town Limits"
                                         :items="[{title: 'Inside', value:'inside'},{title: 'Outside', value:'outside'} ]"
                                         persistent-hint :hint="`Base rates for water and sewer are increased
                                         outside
                                         of
                                         town
                                         limits.`">
-                                    </v-select>       
- <v-number-input  v-show="flatElectricalUsage"label="Usage (gallons)" v-model.number="waterUsage" control-variant="hidden"    v-on:change="refreshCharts">
-                                        
-                                      </v-number-input> 
-                
-</v-card-text>
+                                    </v-select>
+                                    <v-number-input v-show="flatElectricalUsage" label="Usage (gallons)"
+                                        v-model.number="waterUsage" control-variant="hidden"
+                                        v-on:change="refreshCharts">
+                                    </v-number-input>
+                                    <p class="font-italic"> Water usage is used for both water and sewer calculations.
+                                    </p>
+                                </v-card-text>
                             </v-card>
                         </v-col>
-                          <v-col cols="12" key="stormwater">
+                        <v-col cols="12" key="stormwater">
                             <v-card flat border class="pa-4" rounded>
-                                <v-card-title class="text-center">Stormwater</v-card-title>
+                                <v-card-item class="d-flex justify-center" prepend-icon="mdi-weather-pouring">
+                                    <v-card-title class="text-center">Stormwater Tier</v-card-title></v-card-item>
                                 <v-card-text class="pa-4 d-flex flex-column ga-4">
-                               
+
                                     <v-radio-group label="House Type" v-model="houseType" hide-details="auto">
                                         <v-radio label="Single Family Detached, Townhome,
                                         Duplex,
@@ -140,37 +161,36 @@
                                         <v-radio label="Apartment, Condo, Manufactured Home on
                                         Shared Lot, Other" value="no_stormwater"></v-radio>
                                     </v-radio-group>
-                                    <p> Only single family detached homes, townhomes,
+                                    <p class="font-italic"> Only single family detached homes, townhomes,
                                         duplexes,
                                         and
                                         manufactured
                                         homes on individual lots pay stormwater fees.
                                     </p>
-                            
+
                                     <v-select v-if="houseType === 'pays_stormwater'" v-model="houseSize"
                                         hide-details="auto" label="Impermeable Surface Size"
                                         :items="[{title: '400-1,500 square feet', value:'tier1'},{title: '1,500-3,000 square feet', value:'tier2'},{title: '3,000-4,000 square feet', value:'tier3'},{title: '&gt;4,000 square feet', value:'tier4'} ]">
                                     </v-select>
 
-                                    <p>
-                                        Stormwater rates are based on the impermeable surface
-                                        square
-                                        footage, which can include garages, patios, etc.
-                                    <br /> Consider the footprint of your
-                                        house rather than the square footage of all stories. To
+                                    <p class="font-italic">
+                                        Consider the footprint of your
+                                        house (including garages, patios, and other hard surfaces) rather than the
+                                        square footage of all stories. To
                                         learn more about how this is calculated, visit the Town's <a
                                             href="https://www.apexnc.org/Faq.aspx?QID=271">Stormwater Billing FAQ</a>.
                                     </p>
                                     <v-text-field v-model="addressToCheck" clearable label="Street Address"
                                         hide-details="auto">
                                         <template v-slot:append>
-             
-             
-                    <v-icon-btn variant="tonal" v-on:click="updateTier" icon="mdi-map-marker-radius" start></v-icon-btn>
 
-                    
-           
-                </template>
+
+                                            <v-icon-btn variant="tonal" @click="updateTier" icon="mdi-map-marker-radius"
+                                                start :loading="tierLoading"></v-icon-btn>
+
+
+
+                                        </template>
                                     </v-text-field>
                                     <p>This is totally optional - it just helps look
                                         up
@@ -193,151 +213,213 @@
                     </v-row>
                 </v-container>
                 <v-container class="justify-items-center flex-column ga-7">
-                    <v-alert :title="billTotalText"  icon="mdi-calculator"
+                    <v-alert prominent :title="billTotalText" icon="mdi-calculator"
                         text="Use the Bill Breakdown view below to see how each utility contributes." type="info"
-                        variant="outlined" class="w-75 mb-8"></v-alert>
+                        class="w-75 mb-8"></v-alert>
 
                     <v-card border flat rounded class="w-100">
-                        <v-card-title class="d-flex align-center">Bill Breakdown</v-card-title>
-                        <v-card-subtitle>
-                            These rates also take into account the information from your location selections above.
-                        </v-card-subtitle>
+                        <v-card-item class="d-flex justify-center" prepend-icon="mdi-magnify">
+                            <v-card-title class="text-center">Bill Breakdown</v-card-title>
+                        </v-card-item>
                         <v-card-text>
-                        <v-data-table class="text-body-medium font-weight-light" :group-by="rateGroups"
-                            :headers="rateHeaders" :items="rateItems" item-value="category" hide-default-footer
-                            :items-per-page="-1" density="comfortable">
-                            <template v-slot:group-header="{ item, columns, toggleGroup, isGroupOpen }">
-                                <tr @click="toggleGroup(item)">
-                                    <td>
-                                        <v-btn :icon="isGroupOpen(item) ? '$expand' : '$next'" density="compact"
-                                            size="xsmall" variant="flat"></v-btn>
-                                        {{item.value}}
-                                    </td>
-                                    <td class="text-end">{{ `$${item.items.reduce((sum, n) => sum + (n.raw.contribution
-                                        ?
-                                        n.raw.contribution :0), 0).toFixed(2)}` }}</td>
-                                    <td class="operator-column">&nbsp;</td>
-                                    <td class="text-end">{{ item.value == 'Electric' ? this.electricalUsage + ' kWh':
-                                        (item.value == 'Water' ||
-                                        item.value == 'Sewer') ? (this.waterUsage/1000).toFixed(2) + ' kgal': null }}
-                                    </td>
-                                    <td class="operator-column">&nbsp;</td>
-                                    <td>&nbsp;</td>
+                            <v-data-table :group-by="rateGroups" :headers="rateHeaders" :items="rateItems"
+                                item-value="category" hide-default-footer :items-per-page="-1" density="comfortable">
+                                <template v-slot:group-header="{ item, columns, toggleGroup, isGroupOpen }">
+                                    <tr @click="toggleGroup(item)">
+                                        <td>
+                                            <v-btn :icon="isGroupOpen(item) ? '$expand' : '$next'" density="compact"
+                                                size="xsmall" variant="flat"></v-btn>
+                                            {{item.value}}
+                                        </td>
+                                        <td class="text-end">{{ `$${item.items.reduce((sum, n) => sum +
+                                            (n.raw.contribution
+                                            ?
+                                            n.raw.contribution :0), 0)?.toFixed(2)}` }}</td>
+                                        <td class="operator-column">&nbsp;</td>
+                                        <td class="text-end">{{ item.value == 'Electric' ? this.electricalUsage + 'kWh':
+                                            (item.value == 'Water' || item.value == 'Sewer') ?
+                                            (this.waterUsage/1000).toFixed(2) + ' kgal': null}}
+                                        </td>
+                                        <td class="operator-column">&nbsp;</td>
+                                        <td>&nbsp;</td>
 
-                                </tr>
-                            </template>
+                                    </tr>
+                                </template>
 
-                            <template v-slot:item="{ item }">
-                                <tr>
-                                    <td>{{ item.category }}</td>
-                                    <td class="text-end">{{ `$${item.contribution.toFixed(2)}` }}</td>
-                                    <td class="operator-column">{{ item.unit != null ? '=' : ''}}</td>
-                                    <td class="text-end">{{ item.unit != null ? item.unit == '$' ? item.unit +
-                                        item.usage :
-                                        item.usage + " "
-                                        + item.unit : null }}</td>
+                                <template v-slot:item="{ item }">
+                                    <tr>
+                                        <td>{{ item.category }}</td>
+                                        <td class="text-end">{{ `$${item.contribution?.toFixed(2)}` }}</td>
+                                        <td class="font-weight-black">{{ item.unit != null ? '=' : ''}}</td>
+                                        <td class="text-end">{{ item.unit != null ? item.unit == '$' ? item.unit +
+                                            item.usage :
+                                            item.usage + " "
+                                            + item.unit : null }}</td>
 
-                                    <td class="operator-column">{{ item.unit != null ? 'x' : ''}}</td>
-                                    <td class="text-end">{{ item.value }}</td>
+                                        <td class="font-weight-black">{{ item.unit != null ? 'x' : ''}}</td>
+                                        <td class="text-end">{{ item.value }}</td>
 
 
-                                </tr>
-                            </template>
-                        </v-data-table>
+                                    </tr>
+                                </template>
+                            </v-data-table>
                         </v-card-text>
                     </v-card>
+                </v-container>
+                <v-container class="mx-auto">
+                    <v-row class="mx-auto">
+                        <v-col cols="12" lg="4">
+                            <v-card flat border rounded append-icon="mdi-open-in-new" class="mx-auto fill-height"
+                                href="https://www.electricities.com/resource-library/temptracker-365/"
+                                prepend-icon="mdi-thermometer" rel="noopener"
+                                text="This tool from Electricities shows historical temperatures in Apex and can give more context for usage changes over time."
+                                target="_blank" title="TempTracker 365"></v-card>
+                        </v-col>
+                        <v-col cols="12" lg="4">
+                            <v-card flat border rounded append-icon="mdi-open-in-new" class="mx-auto fill-height"
+                                href="https://github.com/vuetifyjs/vuetify/" prepend-icon="mdi-home-analytics" rel="noopener"
+                                text="Also from Electricities, this tool helps you look at the week ahead, considering factors like the weather and your thermostat settings."
+                                target="_blank" title="Energy Forecast"></v-card>
+                        </v-col>
+                        <v-col cols="12" lg="4">
+                            <v-card flat border rounded append-icon="mdi-open-in-new" class="mx-auto  fill-height"
+                                href="https://github.com/vuetifyjs/vuetify/" prepend-icon="mdi-file-document-outline" rel="noopener"
+                                text="This Town of Apex page shares information about the transitional bills in July, August,
+                                and
+                                September
+                                of
+                                2024." target="_blank" title="Third Party Review"></v-card>
+                        </v-col>
 
-                    <v-sheet class="w-100 mt-6" border rounded class="justify-space-around">
+                    </v-row>
+                </v-container>
+                <v-container>
+                    <v-sheet class="w-100 mt-6 d-flex flex-column align-stretch" border rounded>
                         <v-tabs v-model="toggle_exclusive" color="primary" grow>
                             <v-tab value="usage">Total Over Time</v-tab>
                             <v-tab value="base">Base Rates</v-tab>
                             <v-tab value="electric">Electric Usage</v-tab>
                             <v-tab value="water">Water/Sewer Usage</v-tab>
                         </v-tabs>
-                        <v-card title="Estimated Totals Over Time"
-                            :class="[toggle_exclusive == 'usage' ? 'flex-column' : 'd-none', 'w-100 justify-items-center']"
+                        <v-card :class="[toggle_exclusive == 'usage' ? 'd-flex flex-column align-stretch' : 'd-none' ]"
                             flat>
-                            <canvas ref="sameUsageOverYearsChart"></canvas></v-card>
-                        <v-card title="Base Rates Over Time"
-                            :class="[toggle_exclusive == 'base' ? 'flex-column' : 'd-none', 'w-100 justify-items-center']"
+                            <v-card-title class="text-center">Estimated Totals Over Time</v-card-title>
+                            <v-card-text>
+                                <v-sheet class='graph-container d-flex flex-column align-center'>
+                                    <canvas ref="sameUsageOverYearsChart"></canvas>
+                                </v-sheet>
+                                <v-data-table :items="sameUsageOverYearsData" :headers="sameUsageHeaders"
+                                    hide-default-footer></v-data-table>
+                            </v-card-text>
+                        </v-card>
+                        <v-card :class="[toggle_exclusive == 'base' ? 'd-flex flex-column align-stretch' : 'd-none']"
                             flat>
-                            <canvas ref="baseRateChart"></canvas></v-card>
-                        <v-card title="Metered Electric Rates Over Time"
-                            :class="[toggle_exclusive == 'electric' ? 'flex-column' : 'd-none', 'w-100 justify-items-center']"
-                            flat><canvas ref="meteredKwhRateChart"></canvas></v-card>
-                        <v-card title="Metered Water & Sewer Rates Over Time"
-                            :class="[toggle_exclusive == 'water' ? 'flex-column' : 'd-none', 'w-100 justify-items-center']"
+                            <v-card-title class="text-center">Base Rates Over Time</v-card-title>
+                            <v-card-text>
+                                <v-sheet class='graph-container d-flex flex-column align-center'>
+                                    <canvas ref="baseRateChart"></canvas>
+                                </v-sheet>
+                                <v-data-table :items="baseRatesData" :headers="baseRatesHeaders"
+                                    hide-default-footer></v-data-table>
+                            </v-card-text>
+                        </v-card>
+                        <v-card
+                            :class="[toggle_exclusive == 'electric' ? 'd-flex flex-column align-stretch' : 'd-none']"
                             flat>
-                            <canvas ref="meteredKgalRateChart"></canvas></v-card>
+                            <v-card-title class="text-center">Metered Electric Rates Over Time</v-card-title>
+                            <v-card-text>
+                                <v-sheet class='graph-container d-flex flex-column align-center'>
+                                    <canvas ref="meteredKwhRateChart"></canvas>
+                                </v-sheet>
+                                <v-data-table :items="electricRatesData" :headers="electricRatesHeaders"
+                                    hide-default-footer></v-data-table>
+                            </v-card-text>
+                        </v-card>
+                        <v-card :class="[toggle_exclusive == 'water' ? 'd-flex flex-column align-stretch' : 'd-none']"
+                            flat>
+                            <v-card-title class="text-center">Metered Water & Sewer Rates Over Time</v-card-title>
+                            <v-card-text>
+                                <v-sheet class='graph-container d-flex flex-column align-center'>
+                                    <canvas ref="meteredKgalRateChart"></canvas>
+                                </v-sheet>
+                                <v-data-table :items="waterRatesData" :headers="waterRatesHeaders"
+                                    hide-default-footer></v-data-table>
+                            </v-card-text>
+                        </v-card>
                     </v-sheet>
                 </v-container>
-                <v-container>  
-<v-expansion-panels>
- 
-    <v-expansion-panel
-    title="Where are these rates from?"
-  >
-  <v-expansion-panel-text><p>I pulled all the fee schedules from the <a href='https://www.apexnc.org/153/Budget'>budget
-                                reports</a> available on the Town of Apex website.</p>     
-                                <p>These are all based on the town's fiscal years, which run from July to the next June.</p></v-expansion-panel-text>
-  </v-expansion-panel>
-      <v-expansion-panel
-    title="Where are the starting usage values from?"
-  >
-  <v-expansion-panel-text> <p>The placeholders for electric, water, sewer, and stormwater usage now match the average
-                        Apex
-                        resident usage numbers from the town's <a
-                            href="https://www.apexnc.org/DocumentCenter/View/51230/Budget-in-Brief-FY27?bidId=">FY26-27
-                            Budget in Brief document</a>.</p></v-expansion-panel-text>
-  </v-expansion-panel>
-         <v-expansion-panel
-    title="Are you storing my info?"
-  >
-  <v-expansion-panel-text><p>This site does not store any information - everything is calculated within the page
-                            locally
-                            with
-                            the
-                            help of online Town resources.</p></v-expansion-panel-text>
-  </v-expansion-panel>
-    <v-expansion-panel
-    title="Why did you make this?"
+                <v-container>
+                    <v-card border flat rounded class="w-100">
+                        <v-card-title class="text-center">Additional Information</v-card-title>
+                        <v-card-text>
+                            <v-expansion-panels variant="accordion">
 
-  >
-  <v-expansion-panel-text>
-   <p>  I mostly made this because going through and mapping the utility bill to usage and rates
-                            was
-                            tricky,
-                            even for me as an engineer. When I was able to get a spreadsheet set up with the math,
-                            it
-                            did
-                            match
-                            with my expectations, so I made this to give others that same ability to get a gut check
-                            on
-                            their
-                            utility bill.</p>
-  </v-expansion-panel-text>
-  </v-expansion-panel>
-  <v-expansion-panel
-    title="Why doesn't this match my bill?"
-
-  >
-  <v-expansion-panel-text>
-    <p>If you have a payment plan, the plan payment may be the cause of the difference.</p>
-     <p> There are nuances such as solar usage, the highest tier of stormwater fee, and
-                            time-of-year-based,
-                            usage-based electricity billing prior
-                            to Fiscal Year 2022 that are not fully captured here. If this tool gets a lot of
-                            traction or
-                            I
-                            get
-                            more time, I will look at adding those.</p>
-   <p> If you have a question, or think
-                            I
-                            typoed
-                            something, you can email me at lrridge (at) gmail (dot) com.</p>
-  </v-expansion-panel-text>
-  </v-expansion-panel>
-</v-expansion-panels>
+                                <v-expansion-panel title="Where are these rates from?">
+                                    <v-expansion-panel-text>
+                                        <p>I pulled all the fee schedules from the <a
+                                                href='https://www.apexnc.org/153/Budget'>budget
+                                                reports</a> available on the Town of Apex website.</p>
+                                        <p>These are all based on the town's fiscal years, which run from July to the
+                                            next
+                                            June.
+                                        </p>
+                                    </v-expansion-panel-text>
+                                </v-expansion-panel>
+                                <v-expansion-panel title="Where are the starting usage values from?">
+                                    <v-expansion-panel-text>
+                                        <p>The placeholders for electric, water, sewer, and stormwater usage now match
+                                            the
+                                            average Apex resident usage numbers from the town's <a
+                                                href="https://www.apexnc.org/DocumentCenter/View/51230/Budget-in-Brief-FY27?bidId=">FY26-27
+                                                Budget in Brief document</a>.</p>
+                                    </v-expansion-panel-text>
+                                </v-expansion-panel>
+                                <v-expansion-panel title="Are you storing my info?">
+                                    <v-expansion-panel-text>
+                                        <p>This site does not store any information - everything is calculated within
+                                            the
+                                            page
+                                            locally
+                                            with
+                                            the
+                                            help of online Town resources.</p>
+                                    </v-expansion-panel-text>
+                                </v-expansion-panel>
+                                <v-expansion-panel title="Why did you make this?">
+                                    <v-expansion-panel-text>
+                                        <p> I mostly made this because going through and mapping the utility bill to
+                                            usage
+                                            and
+                                            rates was tricky, even for me as an engineer. When I was able to get a
+                                            spreadsheet
+                                            set up with the
+                                            math, it did match with my expectations, so I made this to give others that
+                                            same
+                                            ability to get a gut
+                                            check on their utility bill.</p>
+                                    </v-expansion-panel-text>
+                                </v-expansion-panel>
+                                <v-expansion-panel title="Why doesn't this match my bill?">
+                                    <v-expansion-panel-text>
+                                        <p>If you are on a payment plan, the plan payment may be the cause of the
+                                            difference.
+                                        </p>
+                                        <p> There are nuances such as solar usage, irrigation usage, and the highest
+                                            tier of
+                                            stormwater fee that are not fully captured here. If this tool gets a lot of
+                                            traction or
+                                            I
+                                            get
+                                            more time, I will look at adding those.</p>
+                                        <p> If you have a question, or think
+                                            I
+                                            typoed
+                                            something, you can email me at lrridge (at) gmail (dot) com.</p>
+                                    </v-expansion-panel-text>
+                                </v-expansion-panel>
+                            </v-expansion-panels>
+                        </v-card-text>
+                    </v-card>
                 </v-container>
             </v-main>
         </v-app>
@@ -346,13 +428,11 @@
         const { createApp, ref } = Vue;
         const { createVuetify } = Vuetify;
         const vuetify = createVuetify({
-            theme: {
-                defaultTheme: 'system',
-            },
         });
         createApp({
             data() {
                 return {
+                    theme: ref('light'),
                     rateData: [
                         { year: 'FY 2018-19', electricBase: 14.81, electricRate: 0.1012, electricRatePeak: 0.2656, electricRateOffPeak: 0.0626, waterBase: { inside: 5.54, outside: 11.08 }, waterTier1: 4.19, waterTier2: 4.82, waterTier3: 6.49, sewerBase: { inside: 9.09, outside: 18.18 }, sewerRate: 6.50, garbage: 8.30, recycling: 3.44, yardWaste: 7.83, stormwater: { tier1: 0, tier2: 0, tier3: 0, tier4: 0 } },
                         { year: 'FY 2019-20', electricBase: 15.05, electricRate: 0.1029, electricRatePeak: 0.2700, electricRateOffPeak: 0.0636, waterBase: { inside: 5.54, outside: 11.08 }, waterTier1: 4.19, waterTier2: 4.82, waterTier3: 6.49, sewerBase: { inside: 9.46, outside: 18.91 }, sewerRate: 6.76, garbage: 8.51, recycling: 4.28, yardWaste: 7.83, stormwater: { tier1: 0, tier2: 0, tier3: 0, tier4: 0 } },
@@ -389,65 +469,53 @@
                         { title: 'Rate', key: 'value', align: 'end' },
                     ],
                     toggle_exclusive: ref('usage'),
+                    electricBill: ref(0),
+                    salesTaxBill: ref(0),
+                    waterBill: ref(0),
+                    sewerBill: ref(0),
+                    stormwaterBill: ref(0),
+                    garbageBill: ref(0),
+                    recyclingBill: ref(0),
+                    yardWasteBill: ref(0),
+                    totalBill: ref(0),
+                    currentRate: ref(null),
+                    currentRateYear: ref(null),
+                    tierLoading: ref(false),
+                    sameUsageHeaders: [
+                        { title: 'Year', key: 'name' },
+                        { title: 'Total', key: 'total', align: 'end', value: item => `$${item.total.toFixed(2)}` },
+                        { title: 'Electric (inc. Tax)', key: 'electric', align: 'end', value: item => `$${item.electric.toFixed(2)}` },
+                        { title: 'Water', key: 'water', align: 'end', value: item => `$${item.water.toFixed(2)}` },
+                        { title: 'Sewer', key: 'sewer', align: 'end', value: item => `$${item.sewer.toFixed(2)}` },
+                        { title: 'Other', key: 'other', align: 'end', value: item => `$${item.other.toFixed(2)}` },
+                    ],
+                    baseRatesHeaders: [
+                        { title: 'Year', key: 'name' },
+                        { title: 'Electric', key: 'electric', align: 'end', value: item => `$${item.electric.toFixed(2)}` },
+                        { title: 'Water', key: 'water', align: 'end', value: item => `$${item.water.toFixed(2)}` },
+                        { title: 'Sewer', key: 'sewer', align: 'end', value: item => `$${item.sewer.toFixed(2)}` },
+                        { title: 'Garbage', key: 'garbage', align: 'end', value: item => `$${item.garbage.toFixed(2)}` },
+                        { title: 'Recycling', key: 'recycling', align: 'end', value: item => `$${item.recycling.toFixed(2)}` },
+                        { title: 'Yard Waste', key: 'yardWaste', align: 'end', value: item => `$${item.yardWaste.toFixed(2)}` },
+                        { title: 'Stormwater', key: 'stormwater', align: 'end', value: item => `$${item.stormwater.toFixed(2)}` },
+                    ],
+                    electricRatesHeaders: [
+                        { title: 'Year', key: 'name' },
+                        { title: 'Flat Rate', key: 'flat', align: 'end', value: item => `$${item.flat.toFixed(4)} / kWh` },
+                        { title: 'Peak Rate', key: 'peak', align: 'end', value: item => `$${item.peak.toFixed(4)} / kWh` },
+                        { title: 'Off-Peak Rate', key: 'offPeak', align: 'end', value: item => `$${item.offPeak.toFixed(4)} / kWh` },
+                    ],
+                    waterRatesHeaders: [
+                        { title: 'Year', key: 'name' },
+                        { title: 'Water - Tier 1', key: 'tier1', align: 'end', value: item => `$${item.tier1.toFixed(2)} / kgal` },
+                        { title: 'Water - Tier 2', key: 'tier2', align: 'end', value: item => `$${item.tier2.toFixed(2)} / kgal` },
+                        { title: 'Water - Tier 3', key: 'tier3', align: 'end', value: item => `$${item.tier3.toFixed(2)} / kgal` },
+                        { title: 'Sewer', key: 'sewer', align: 'end', value: item => `$${item.sewer.toFixed(2)} / kgal` },
+                    ],
 
                 };
             },
             computed: {
-                rateItems() {
-                    let calcItems = [];
-                    calcItems.push({ name: 'Electric', category: 'Base Charge', value: `$${this.currentRates.electricBase.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRates.electricBase });
-                    if (this.flatElectricalUsage) {
-                        calcItems.push({ name: 'Electric', category: 'Flat Rate', value: `$${this.currentRates.electricRate.toFixed(4)} / kWh`, usage: this.flatUsage, unit: 'kWh', contribution: this.currentRates.electricRate * this.flatUsage });
-                    }
-                    else {
-                        calcItems.push({ name: 'Electric', category: 'Peak Rate', value: `$${this.currentRates.electricRatePeak.toFixed(4)} / kWh`, usage: this.peakUsage, unit: 'kWh', contribution: this.currentRates.electricRatePeak * this.peakUsage });
-                        calcItems.push({ name: 'Electric', category: 'Off-Peak Rate', value: `$${this.currentRates.electricRateOffPeak.toFixed(4)} / kWh`, usage: this.offPeakUsage, unit: 'kWh', contribution: this.currentRates.electricRateOffPeak * this.peakUsage });
-                    }
-                    calcItems.push({ name: 'Electric', category: 'Sales Tax', value: `${(this.salesTax * 100).toFixed(0)}%`, usage: this.electricBill.toFixed(2), unit: '$', contribution: this.salesTaxBill });
-                    if (this.location == 'inside') {
-                        calcItems.push({ name: 'Water', category: 'Base Charge', value: `$${this.currentRates.waterBase.inside.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRates.waterBase.inside });
-                    }
-                    else {
-                        calcItems.push({ name: 'Water', category: 'Base Charge', value: `$${this.currentRates.waterBase.outside.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRates.waterBase.outside });
-                    }
-                    calcItems.push({ name: 'Water', category: 'Tier 1 Usage Rate', value: `$${this.currentRates.waterTier1.toFixed(2)} / kgal`, usage: (Math.min(6000, this.waterUsage) / 1000).toFixed(2), unit: 'kgal', contribution: (Math.min(6000, this.waterUsage) / 1000) * this.currentRates.waterTier1 });
-                    if (this.waterUsage > 6000) {
-                        calcItems.push({ name: 'Water', category: 'Tier 2 Usage Rate', value: `$${this.currentRates.waterTier2.toFixed(2)} / kgal`, usage: ((Math.min(12000, this.waterUsage) - 6000) / 1000).toFixed(2), unit: 'kgal', contribution: ((Math.min(12000, this.waterUsage) - 6000) / 1000) * this.currentRates.waterTier2 });
-                    }
-                    if (this.waterUsage > 12000) {
-                        calcItems.push({ name: 'Water', category: 'Tier 3 Usage Rate', value: `$${this.currentRates.waterTier3.toFixed(2)} / kgal`, usage: ((this.waterUsage - 12000) / 1000).toFixed(2), unit: 'kgal', contribution: ((this.waterUsage - 12000) / 1000) * this.currentRates.waterTier3 });
-                    }
-                    if (this.location == 'inside') {
-                        calcItems.push({ name: 'Sewer', category: 'Base Charge', value: `$${this.currentRates.sewerBase.inside.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRates.sewerBase.inside });
-                    }
-                    else {
-                        calcItems.push({ name: 'Sewer', category: 'Base Charge', value: `$${this.currentRates.sewerBase.outside.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRates.sewerBase.inside });
-                    }
-                    calcItems.push({ name: 'Sewer', category: 'Usage Rate', value: `$${this.currentRates.sewerRate.toFixed(2)} / kgal`, usage: (this.waterUsage / 1000).toFixed(2), unit: 'kgal', contribution: this.waterUsage / 1000 * this.currentRates.sewerRate });
-                    calcItems.push({ name: 'Garbage', category: 'Base Charge', value: `$${this.currentRates.garbage.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRates.garbage });
-                    calcItems.push({ name: 'Recycling', category: 'Base Charge', value: `$${this.currentRates.recycling.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRates.recycling });
-                    calcItems.push({ name: 'Yard Waste', category: 'Base Charge', value: `$${this.currentRates.yardWaste.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRates.yardWaste });
-                    if (this.houseType === 'pays_stormwater') {
-                        switch (this.houseSize) {
-                            case 'tier1':
-                                calcItems.push({ name: 'Stormwater', category: 'Base Charge', value: `$${this.currentRates.stormwater.tier1.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRates.stormwater.tier1 });
-                                break;
-                            case 'tier2':
-                                calcItems.push({ name: 'Stormwater', category: 'Base Charge', value: `$${this.currentRates.stormwater.tier2.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRates.stormwater.tier2 });
-                                break;
-                            case 'tier3':
-                                calcItems.push({ name: 'Stormwater', category: 'Base Charge', value: `$${this.currentRates.stormwater.tier3.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRates.stormwater.tier3 });
-                                break;
-                            case 'tier4':
-                                calcItems.push({ name: 'Stormwater', category: 'Base Charge', value: `$${this.currentRates.stormwater.tier4.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRates.stormwater.tier4 });;
-                                break;
-                        }
-                    }
-
-
-                    return calcItems;
-
-                },
                 flatElectricalUsage() {
                     return this.usageType === 'flat';
                 },
@@ -457,98 +525,246 @@
                 electricalUsage() {
                     return this.flatElectricalUsage ? this.flatUsage : this.peakUsage + this.offPeakUsage;
                 },
-                currentRates() {
-                    return this.rateData[this.rateData.length - 1];
-                },
-                electricBill() {
-                    if (this.usageType === 'flat') {
-                        return this.currentRates.electricBase + (this.flatUsage * this.currentRates.electricRate);
-                    } else {
-                        return this.currentRates.electricBase +
-                            (this.peakUsage * this.currentRates.electricRatePeak) +
-                            (this.offPeakUsage * this.currentRates.electricRateOffPeak);
-                    }
-                },
-                salesTaxBill() {
-                    return this.electricBill * this.salesTax;
-                },
-                waterBill() {
-                    const usage = this.waterUsage;
-                    let cost = this.location == 'inside' ? this.currentRates.waterBase.inside : this.currentRates.waterBase.outside;
-
-                    if (usage <= 6000) {
-                        cost += usage / 1000 * this.currentRates.waterTier1;
-                    } else if (usage <= 12000) {
-                        cost += 6 * this.currentRates.waterTier1;
-                        cost += (usage - 6000) / 1000 * this.currentRates.waterTier2;
-                    } else {
-                        cost += 6 * this.currentRates.waterTier1;
-                        cost += 6 * this.currentRates.waterTier2;
-                        cost += (usage - 12000) / 1000 * this.currentRates.waterTier3;
-                    }
-
-                    return cost;
-                },
-                sewerBill() {
-                    let base = this.location == 'inside' ? this.currentRates.sewerBase.inside : this.currentRates.sewerBase.outside;
-                    return base + (this.waterUsage / 1000 * this.currentRates.sewerRate);
-                },
-                garbageBill() {
-                    return this.currentRates.garbage;
-                },
-                recyclingBill() {
-                    return this.currentRates.recycling;
-                },
-                yardWasteBill() {
-                    return this.currentRates.yardWaste;
-                },
-                stormwaterBill() {
-                    if (this.houseType == 'no_stormwater') {
-                        return 0;
-                    }
-                    switch (this.houseSize) {
-                        case 'tier1':
-                            return this.currentRates.stormwater.tier1;
-                            break;
-                        case 'tier2':
-                            return this.currentRates.stormwater.tier2;
-                            break;
-                        case 'tier3':
-                            return this.currentRates.stormwater.tier3;
-                            break;
-                        case 'tier4':
-                            return this.currentRates.stormwater.tier4;
-                            break;
-                    }
-                    return 0;
-                },
-                totalBill() {
-                    return this.electricBill + this.salesTaxBill + this.waterBill + this.sewerBill + this.garbageBill + this.recyclingBill + this.yardWasteBill + this.stormwaterBill;
-                },
                 billTotalText() {
-                    return `Your bill total is $${this.totalBill.toFixed(2)}`;
+                    return `Your bill total is $${this.totalBill.toFixed(2)}.`;
                 },
+                years() {
+                    return this.rateData?.map(d => d.year);
+                },
+                rateItems() {
+                    return this.calcRateItems();
+                },
+                sameUsageOverYearsData() {
+                    let dataArray = [];
+                    this.rateData?.forEach(d =>
+                        dataArray.push({ name: d.year, total: this.calcAllBills(d.year), electric: (this.calcElectricBill(d.year)) * (1 + this.salesTax), water: this.calcWaterBill(d.year), sewer: this.calcSewerBill(d.year), other: (this.calcGarbageBill(d.year) + this.calcRecyclingBill(d.year) + this.calcStormwaterBill(d.year) + this.calcYardWasteBill(d.year)) })
+                    );
+                    return dataArray;
 
+                },
+                baseRatesData() {
+                    let dataArray = [];
+                    this.rateData?.forEach(d => dataArray.push({ name: d.year, electric: d.electricBase, water: this.location == 'inside' ? d.waterBase.inside : d.waterBase.outside, sewer: this.location == 'inside' ? d.sewerBase.inside : d.sewerBase.outside, garbage: d.garbage, recycling: d.recycling, yardWaste: d.yardWaste, stormwater: this.calcStormwaterBill(d.year) })
+                    );
+                    return dataArray;
+                },
+                electricRatesData() {
+                    let dataArray = [];
+                    this.rateData?.forEach(d => dataArray.push({ name: d.year, flat: d.electricRate, peak: d.electricRatePeak, offPeak: d.electricRateOffPeak })
+                    );
+                    return dataArray;
+                },
+                waterRatesData() {
+                    let dataArray = [];
+                    this.rateData?.forEach(d => dataArray.push({ name: d.year, tier1: d.waterTier1, tier2: d.waterTier2, tier3: d.waterTier3, sewer: d.sewerRate })
+                    );
+                    return dataArray;
+                }
             },
             mounted() {
+                this.setCurrentRate();
+                this.calcAllBills();
                 this.createCharts();
             },
             watch: {
                 // whenever question changes, this function will run
                 usageType(newUsageType, oldUsageType) {
+                    this.calcElectricBill();
                     this.refreshCharts();
                 },
                 location(newLocation, oldLocation) {
+                    this.calcWaterBill();
+                    this.calcSewerBill();
                     this.refreshCharts();
                 },
                 houseType(newHouseType, oldHouseType) {
+                    this.calcStormwaterBill();
                     this.refreshCharts();
                 },
                 houseSize(newHouseSize, oldHouseSize) {
+                    this.calcStormwaterBill();
                     this.refreshCharts();
                 }
             },
             methods: {
+                onToggleTheme() {
+                    this.theme = (this.theme === 'light' ? 'dark' : 'light');
+                },
+                calcAllBills(yearOverride) {
+                    const yearLookup = yearOverride ? yearOverride : this.currentRateYear;
+                    let cost = 0;
+                    cost += this.calcElectricBill(yearLookup) * (1 + this.salesTax);
+                    cost += this.calcWaterBill(yearLookup);
+                    cost += this.calcSewerBill(yearLookup);
+                    cost += this.calcStormwaterBill(yearLookup);
+                    cost += this.calcGarbageBill(yearLookup);
+                    cost += this.calcRecyclingBill(yearLookup);
+                    cost += this.calcYardWasteBill(yearLookup);
+                    if (yearLookup == this.currentRateYear) {
+                        this.totalBill = cost;
+                    }
+                    return cost;
+                },
+                setCurrentRate() {
+                    this.currentRate = this.rateData ? this.rateData[this.rateData?.length - 1] : null;
+                    this.currentRateYear = this.rateData ? this.rateData?.at(-1)?.year : 'FY 2026-27';
+                },
+                calcRateItems() {
+                    let calcItems = [];
+                    calcItems.push({ name: 'Electric', category: 'Base Charge', value: `$${this.currentRate?.electricBase?.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRate?.electricBase });
+                    if (this.flatElectricalUsage) {
+                        calcItems.push({ name: 'Electric', category: 'Flat Rate', value: `$${this.currentRate?.electricRate?.toFixed(4)} / kWh`, usage: this.flatUsage, unit: 'kWh', contribution: this.currentRate?.electricRate * this.flatUsage });
+                    }
+                    else {
+                        calcItems.push({ name: 'Electric', category: 'Peak Rate', value: `$${this.currentRate?.electricRatePeak?.toFixed(4)} / kWh`, usage: this.peakUsage, unit: 'kWh', contribution: this.currentRate?.electricRatePeak * this.peakUsage });
+                        calcItems.push({ name: 'Electric', category: 'Off-Peak Rate', value: `$${this.currentRate?.electricRateOffPeak?.toFixed(4)} / kWh`, usage: this.offPeakUsage, unit: 'kWh', contribution: this.currentRate?.electricRateOffPeak * this.peakUsage });
+                    }
+                    calcItems.push({ name: 'Electric', category: 'Sales Tax', value: `${(this.salesTax * 100).toFixed(0)}%`, usage: this.electricBill?.toFixed(2), unit: '$', contribution: this.salesTaxBill });
+                    if (this.location == 'inside') {
+                        calcItems.push({ name: 'Water', category: 'Base Charge', value: `$${this.currentRate?.waterBase.inside?.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRate?.waterBase.inside });
+                    }
+                    else {
+                        calcItems.push({ name: 'Water', category: 'Base Charge', value: `$${this.currentRate?.waterBase.outside?.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRate?.waterBase.outside });
+                    }
+                    calcItems.push({ name: 'Water', category: 'Tier 1 Usage Rate', value: `$${this.currentRate?.waterTier1?.toFixed(2)} / kgal`, usage: (Math.min(6000, this.waterUsage) / 1000).toFixed(2), unit: 'kgal', contribution: (Math.min(6000, this.waterUsage) / 1000) * this.currentRate?.waterTier1 });
+                    if (this.waterUsage > 6000) {
+                        calcItems.push({ name: 'Water', category: 'Tier 2 Usage Rate', value: `$${this.currentRate?.waterTier2?.toFixed(2)} / kgal`, usage: ((Math.min(12000, this.waterUsage) - 6000) / 1000).toFixed(2), unit: 'kgal', contribution: ((Math.min(12000, this.waterUsage) - 6000) / 1000) * this.currentRate?.waterTier2 });
+                    }
+                    if (this.waterUsage > 12000) {
+                        calcItems.push({ name: 'Water', category: 'Tier 3 Usage Rate', value: `$${this.currentRate?.waterTier3?.toFixed(2)} / kgal`, usage: ((this.waterUsage - 12000) / 1000).toFixed(2), unit: 'kgal', contribution: ((this.waterUsage - 12000) / 1000) * this.currentRate?.waterTier3 });
+                    }
+                    if (this.location == 'inside') {
+                        calcItems.push({ name: 'Sewer', category: 'Base Charge', value: `$${this.currentRate?.sewerBase.inside?.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRate?.sewerBase.inside });
+                    }
+                    else {
+                        calcItems.push({ name: 'Sewer', category: 'Base Charge', value: `$${this.currentRate?.sewerBase.outside?.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRate?.sewerBase.inside });
+                    }
+                    calcItems.push({ name: 'Sewer', category: 'Usage Rate', value: `$${this.currentRate?.sewerRate?.toFixed(2)} / kgal`, usage: (this.waterUsage / 1000).toFixed(2), unit: 'kgal', contribution: this.waterUsage / 1000 * this.currentRate?.sewerRate });
+                    calcItems.push({ name: 'Garbage', category: 'Base Charge', value: `$${this.currentRate?.garbage?.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRate?.garbage });
+                    calcItems.push({ name: 'Recycling', category: 'Base Charge', value: `$${this.currentRate?.recycling?.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRate?.recycling });
+                    calcItems.push({ name: 'Yard Waste', category: 'Base Charge', value: `$${this.currentRate?.yardWaste?.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRate?.yardWaste });
+                    if (this.houseType === 'pays_stormwater') {
+                        switch (this.houseSize) {
+                            case 'tier1':
+                                calcItems.push({ name: 'Stormwater', category: 'Base Charge', value: `$${this.currentRate?.stormwater.tier1?.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRate?.stormwater.tier1 });
+                                break;
+                            case 'tier2':
+                                calcItems.push({ name: 'Stormwater', category: 'Base Charge', value: `$${this.currentRate?.stormwater.tier2?.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRate?.stormwater.tier2 });
+                                break;
+                            case 'tier3':
+                                calcItems.push({ name: 'Stormwater', category: 'Base Charge', value: `$${this.currentRate?.stormwater.tier3?.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRate?.stormwater.tier3 });
+                                break;
+                            case 'tier4':
+                                calcItems.push({ name: 'Stormwater', category: 'Base Charge', value: `$${this.currentRate?.stormwater.tier4?.toFixed(2)}`, usage: null, unit: null, contribution: this.currentRate?.stormwater.tier4 });;
+                                break;
+                        }
+                    }
+
+                    return calcItems;
+
+                },
+                calcElectricBill(yearOverride) {
+                    const yearLookup = yearOverride ? yearOverride : this.currentRateYear;
+                    const rateLookup = this.rateData?.find(rate => rate.year == yearLookup);
+                    let cost = 0;
+                    if (this.usageType === 'flat') {
+                        cost = rateLookup?.electricBase + (this.flatUsage * rateLookup?.electricRate);
+                    } else {
+                        cost = rateLookup?.electricBase +
+                            (this.peakUsage * rateLookup?.electricRatePeak) +
+                            (this.offPeakUsage * rateLookup?.electricRateOffPeak);
+                    }
+                    if (yearLookup == this.currentRateYear) {
+                        this.electricBill = cost;
+                        this.salesTaxBill = this.salesTax * cost;
+                    }
+                    return cost;
+                },
+                calcWaterBill(yearOverride) {
+                    const usage = this.waterUsage;
+                    const yearLookup = yearOverride ? yearOverride : this.currentRateYear;
+                    const rateLookup = this.rateData?.find(rate => rate.year == yearLookup);
+                    let cost = this.location == 'inside' ? rateLookup?.waterBase.inside : rateLookup?.waterBase.outside;
+
+                    if (usage <= 6000) {
+                        cost += usage / 1000 * rateLookup?.waterTier1;
+                    } else if (usage <= 12000) {
+                        cost += 6 * rateLookup?.waterTier1;
+                        cost += (usage - 6000) / 1000 * rateLookup?.waterTier2;
+                    } else {
+                        cost += 6 * rateLookup?.waterTier1;
+                        cost += 6 * rateLookup?.waterTier2;
+                        cost += (usage - 12000) / 1000 * rateLookup?.waterTier3;
+                    }
+                    if (yearLookup == this.currentRateYear) {
+                        this.waterBill = cost;
+                    }
+                    return cost;
+                },
+                calcSewerBill(yearOverride) {
+                    const usage = this.waterUsage;
+                    const yearLookup = yearOverride ? yearOverride : this.currentRateYear;
+                    const rateLookup = this.rateData?.find(rate => rate.year == yearLookup);
+                    let cost = this.location == 'inside' ? rateLookup?.sewerBase.inside : rateLookup?.sewerBase.outside;
+                    cost += (usage / 1000) * rateLookup?.sewerRate;
+                    if (yearLookup == this.currentRateYear) {
+                        this.sewerBill = cost;
+                    }
+                    return cost;
+                },
+                calcGarbageBill(yearOverride) {
+                    const yearLookup = yearOverride ? yearOverride : this.currentRateYear;
+                    const rateLookup = this.rateData?.find(rate => rate.year == yearLookup);
+                    const cost = rateLookup?.garbage;
+                    if (yearLookup == this.currentRateYear) {
+                        this.garbageBill = cost;
+                    }
+                    return cost;
+                },
+                calcRecyclingBill(yearOverride) {
+                    const yearLookup = yearOverride ? yearOverride : this.currentRateYear;
+                    const rateLookup = this.rateData?.find(rate => rate.year == yearLookup);
+                    const cost = rateLookup?.recycling;
+                    if (yearLookup == this.currentRateYear) {
+                        this.recyclingBill = cost;
+                    }
+                    return cost;
+                },
+                calcYardWasteBill(yearOverride) {
+                    const yearLookup = yearOverride ? yearOverride : this.currentRateYear;
+                    const rateLookup = this.rateData?.find(rate => rate.year == yearLookup);
+                    const cost = rateLookup?.yardWaste;
+                    if (yearLookup == this.currentRateYear) {
+                        this.yardWasteBill = cost;
+                    }
+                    return cost;
+                },
+                calcStormwaterBill(yearOverride) {
+                    const yearLookup = yearOverride ? yearOverride : this.currentRateYear;
+                    const rateLookup = this.rateData?.find(rate => rate.year == yearLookup);
+                    let cost = 0;
+                    if (this.houseType == 'pays_stormwater') {
+
+                        switch (this.houseSize) {
+                            case 'tier1':
+                                cost = rateLookup?.stormwater.tier1;
+                                break;
+                            case 'tier2':
+                                cost = rateLookup?.stormwater.tier2;
+                                break;
+                            case 'tier3':
+                                cost = rateLookup?.stormwater.tier3;
+                                break;
+                            case 'tier4':
+                                cost = rateLookup?.stormwater.tier4;
+                                break;
+                        }
+                    }
+                    if (yearLookup == this.currentRateYear) {
+                        this.stormwaterBill = cost;
+                    }
+                    return cost;
+                },
                 refreshCharts() {
                     this.meteredKgalChart.destroy();
                     this.meteredKwhChart.destroy();
@@ -557,6 +773,7 @@
                     this.createCharts();
                 },
                 updateTier() {
+                    this.tierLoading = true;
                     const esc = s => s.replace(/'/g, "''");
                     const where = `SITE_ADDRESS LIKE '%${esc(this.addressToCheck)}%' OR OWNER LIKE '%${esc(this.addressToCheck)}%' OR PIN_NUM LIKE '%${esc(this.addressToCheck)}%'`;
                     let params = new URLSearchParams({
@@ -576,13 +793,14 @@
                             if (data?.features && data?.features[0] != null) {
                                 this.houseSize = 'tier' + data?.features[0]?.attributes?.TIER;
                             }
+                            this.tierLoading = false;
                         });
                     });
 
                 },
                 createCharts() {
-                    const years = this.rateData.map(d => d.year);
-                    const startingYearData = this.rateData[0];
+                    this.calcRateItems();
+                    const years = this.years;
                     // Base Rates Chart
 
                     const baseCtx = this.$refs.baseRateChart?.getContext('2d');
@@ -593,7 +811,7 @@
                             datasets: [
                                 {
                                     label: 'Electric',
-                                    data: this.rateData.map(d => d.electricBase),
+                                    data: this.rateData?.map(d => d.electricBase),
                                     borderColor: '#f59e0b',
                                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
                                     tension: 0
@@ -601,43 +819,42 @@
 
                                 {
                                     label: 'Water',
-                                    data: this.location == 'inside' ? this.rateData.map(d => d.waterBase.inside) : this.rateData.map(d => d.waterBase.outside),
+                                    data: this.location == 'inside' ? this.rateData?.map(d => d.waterBase.inside) : this.rateData?.map(d => d.waterBase.outside),
                                     borderColor: '#3b82f6',
                                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
                                     tension: 0,
                                 },
                                 {
                                     label: 'Sewer',
-                                    data: this.location == 'inside' ? this.rateData.map(d => d.sewerBase.inside) : this.rateData.map(d => d.sewerBase.outside),
+                                    data: this.location == 'inside' ? this.rateData?.map(d => d.sewerBase.inside) : this.rateData?.map(d => d.sewerBase.outside),
                                     borderColor: '#10b981',
                                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
                                     tension: 0
                                 },
                                 {
                                     label: 'Garbage',
-                                    data: this.rateData.map(d => d.garbage),
+                                    data: this.rateData?.map(d => d.garbage),
                                     borderColor: '#ff5747',
                                     backgroundColor: 'rgba(255, 221, 212, 0.1)',
                                     tension: 0
                                 },
                                 {
                                     label: 'Recycling',
-                                    data: this.rateData.map(d => d.recycling),
+                                    data: this.rateData?.map(d => d.recycling),
                                     borderColor: '#10b981',
                                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
                                     tension: 0
                                 },
                                 {
                                     label: 'Yard Waste',
-                                    data: this.rateData.map(d => d.yardWaste),
-                                    data: this.rateData.map(d => d.yardWaste),
+                                    data: this.rateData?.map(d => d.yardWaste),
                                     borderColor: '#df00ad',
                                     backgroundColor: 'rgba(255, 218, 245, 0.1)',
                                     tension: 0
                                 },
                                 {
                                     label: 'Stormwater',
-                                    data: this.houseType == 'no_stormwater' ? this.rateData.map(d => 0) : this.houseSize == 'tier1' ? this.rateData.map(d => d.stormwater.tier1) : this.houseSize == 'tier2' ? this.rateData.map(d => d.stormwater.tier2) : this.houseSize == 'tier3' ? this.rateData.map(d => d.stormwater.tier3) : this.rateData.map(d => d.stormwater.tier4),
+                                    data: this.rateData?.map(d => this.calcStormwaterBill(d.year)),
                                     borderColor: '#0891b2',
                                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
                                     tension: 0
@@ -647,7 +864,6 @@
                         options: {
                             animation: false,
                             responsive: true,
-                            maintainAspectRatio: true,
                             plugins: {
                                 legend: {
                                     position: 'bottom'
@@ -689,14 +905,14 @@
                             datasets: [
                                 {
                                     label: 'Electric Flat Rate',
-                                    data: this.rateData.map(d => d.electricRate),
+                                    data: this.rateData?.map(d => d.electricRate),
                                     borderColor: '#f59e0b',
                                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
                                     tension: 0
                                 },
                                 {
                                     label: 'Electric Peak Rate',
-                                    data: this.rateData.map(d => d.electricRatePeak),
+                                    data: this.rateData?.map(d => d.electricRatePeak),
                                     borderColor: '#f59e0b',
                                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
                                     tension: 0,
@@ -704,7 +920,7 @@
                                 },
                                 {
                                     label: 'Electric Off-Peak Rate',
-                                    data: this.rateData.map(d => d.electricRateOffPeak),
+                                    data: this.rateData?.map(d => d.electricRateOffPeak),
                                     borderColor: '#f59e0b',
                                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
                                     tension: 0,
@@ -716,7 +932,6 @@
                         options: {
                             animation: false,
                             responsive: true,
-                            maintainAspectRatio: true,
                             plugins: {
                                 legend: {
                                     position: 'bottom'
@@ -757,14 +972,14 @@
                             datasets: [
                                 {
                                     label: 'Water Tier 1 ($/kgal)',
-                                    data: this.rateData.map(d => d.waterTier1),
+                                    data: this.rateData?.map(d => d.waterTier1),
                                     borderColor: '#3b82f6',
                                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
                                     tension: 0
                                 },
                                 {
                                     label: 'Water Tier 2 ($/kgal)',
-                                    data: this.rateData.map(d => d.waterTier2),
+                                    data: this.rateData?.map(d => d.waterTier2),
                                     borderColor: '#60a5fa',
                                     backgroundColor: 'rgba(96, 165, 250, 0.1)',
                                     tension: 0,
@@ -772,7 +987,7 @@
                                 },
                                 {
                                     label: 'Water Tier 3 ($/kgal)',
-                                    data: this.rateData.map(d => d.waterTier3),
+                                    data: this.rateData?.map(d => d.waterTier3),
                                     borderColor: '#93c5fd',
                                     backgroundColor: 'rgba(147, 197, 253, 0.1)',
                                     tension: 0,
@@ -780,7 +995,7 @@
                                 },
                                 {
                                     label: 'Sewer ($/kgal)',
-                                    data: this.rateData.map(d => d.sewerRate),
+                                    data: this.rateData?.map(d => d.sewerRate),
                                     borderColor: '#10b981',
                                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
                                     tension: 0
@@ -790,7 +1005,6 @@
                         options: {
                             animation: false,
                             responsive: true,
-                            maintainAspectRatio: true,
                             plugins: {
                                 legend: {
                                     position: 'bottom'
@@ -833,35 +1047,35 @@
                             datasets: [
                                 {
                                     label: 'Total',
-                                    data: this.rateData.map(d => (d.electricBase + this.flatUsage * d.electricRate) * (1 + this.salesTax) + (this.location == 'inside' ? d.waterBase.inside : d.waterBase.outside) + (Math.min(6000, this.waterUsage) / 1000) * d.waterTier1 + (Math.max(0, this.waterUsage - 6000) / 1000) * d.waterTier2 + (Math.max(0, this.waterUsage - 12000) / 1000) * d.waterTier3 + (this.location == 'inside' ? d.sewerBase.inside : d.sewerBase.outside) + (Math.min(6000, this.waterUsage) / 1000) * d.sewerRate + d.garbage + d.recycling + d.yardWaste + (this.houseType == 'no_stormwater' ? 0 : this.houseSize == 'tier1' ? d.stormwater.tier1 : this.houseSize == 'tier2' ? d.stormwater.tier2 : this.houseSize == 'tier3' ? d.stormwater.tier3 : d.stormwater.tier4)),
+                                    data: this.rateData?.map(d => this.calcAllBills(d.year)),
                                     borderColor: '#4f46e5',
                                     backgroundColor: 'rgba(45, 158, 11, 0.1)',
                                     tension: 0
                                 },
                                 {
                                     label: 'Electric (Inc. Sales Tax)',
-                                    data: this.rateData.map(d => (d.electricBase + this.flatUsage * d.electricRate) * (1 + this.salesTax)),
+                                    data: this.rateData?.map(d => (this.calcElectricBill(d.year)) * (1 + this.salesTax)),
                                     borderColor: '#f59e0b',
                                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
                                     tension: 0
                                 },
                                 {
                                     label: 'Water',
-                                    data: this.rateData.map(d => (this.location == 'inside' ? d.waterBase.inside : d.waterBase.outside) + (Math.min(6000, this.waterUsage) / 1000) * d.waterTier1 + (Math.max(0, this.waterUsage - 6000) / 1000) * d.waterTier2 + (Math.max(0, this.waterUsage - 12000) / 1000) * d.waterTier3),
+                                    data: this.rateData?.map(d => (this.calcWaterBill(d.year))),
                                     borderColor: '#3b82f6',
                                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
                                     tension: 0
                                 },
                                 {
                                     label: 'Sewer',
-                                    data: this.rateData.map(d => (this.location == 'inside' ? d.sewerBase.inside : d.sewerBase.outside) + (Math.min(6000, this.waterUsage) / 1000) * d.sewerRate),
+                                    data: this.rateData?.map(d => (this.calcSewerBill(d.year))),
                                     borderColor: '#10b981',
                                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
                                     tension: 0
                                 },
                                 {
                                     label: 'Other (Garbage + Recycling + Yard Waste + Stormwater)',
-                                    data: this.rateData.map(d => d.garbage + d.recycling + d.yardWaste + (this.houseType == 'no_stormwater' ? 0 : this.houseSize == 'tier1' ? d.stormwater.tier1 : this.houseSize == 'tier2' ? d.stormwater.tier2 : this.houseSize == 'tier3' ? d.stormwater.tier3 : d.stormwater.tier4)),
+                                    data: this.rateData?.map(d => (this.calcGarbageBill(d.year) + this.calcRecyclingBill(d.year) + this.calcStormwaterBill(d.year) + this.calcYardWasteBill(d.year))),
                                     borderColor: '#df00ad',
                                     backgroundColor: 'rgba(255, 218, 245, 0.1)',
                                     tension: 0
@@ -871,7 +1085,6 @@
                         options: {
                             animation: false,
                             responsive: true,
-                            maintainAspectRatio: true,
                             plugins: {
                                 legend: {
                                     position: 'bottom'
