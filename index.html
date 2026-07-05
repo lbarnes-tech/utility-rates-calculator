@@ -41,44 +41,25 @@
             <v-main>
                 <v-container class="justify-center flex-column ga-7">
                     <v-card flat border rounded>
-                        <v-card-item class="d-flex justify-center">
+                        <v-card-item class="d-flex justify-center text-break">
                             <v-card-title class="text-center">Apex Utility Rate Tracker</v-card-title>
-                            <v-card-subtitle>
-                                This webpage is not affiliated with, created by, or endorsed by the Town of Apex.
-                            </v-card-subtitle>
                         </v-card-item>
                         <v-card-text>
-                            <v-list lines="two">
-                                <v-list-subheader>Recent Updates</v-list-subheader>
-                                <v-list-item variant="flat">
-                                    <template v-slot:prepend>
-                                        <v-avatar>
-                                            <v-icon color="cyan-darken-2" icon="mdi-new-box"></v-icon>
-                                        </v-avatar>
-                                    </template>
-                                    <v-list-item-title>
-                                        The calculator has been updated with the rates for FY2026-27.
-                                    </v-list-item-title>
-                                </v-list-item>
-                                <v-list-item variant="flat">
-                                    <template v-slot:prepend>
-                                        <v-avatar>
-                                            <v-icon color="orange-darken-2" icon="mdi-restart-alert"></v-icon>
-                                        </v-avatar>
-                                    </template>
-                                    <v-list-item-title>
-                                        The town is returning to standard billing procedures in July 2026.
-                                    </v-list-item-title>
-                                    <v-list-item-subtitle>
-                                        This <a href="https://www.apexnc.org/2014/Billing-Updates">town resource covers
-                                            the
-                                            details</a>,
-                                        including information about assistance programs and payment plans.
-                                    </v-list-item-subtitle>
-                                </v-list-item>
-                            </v-list>
-
-
+                          <p class="text-center font-italic text-title-medium"> This webpage is not affiliated with, created by, or endorsed by the Town of Apex.</p> 
+                            <p><strong>Recent Updates</strong></p>
+                            <ul>
+                                <li>
+                                    The calculator has been updated with the rates for FY2026-27.
+                                </li>
+                                <li>The Town of Apex returns to standard billing procedures in July 2026. <ul>
+                                        <li> This <a href="https://www.apexnc.org/2014/Billing-Updates">town
+                                                resource</a>
+                                            covers the details, including information about assistance programs and
+                                            payment
+                                            plans.</li>
+                                    </ul>
+                                </li>
+                            </ul>
                         </v-card-text>
 
                     </v-card>
@@ -212,10 +193,10 @@
                         </v-col>
                     </v-row>
                 </v-container>
-                <v-container class="justify-items-center flex-column ga-7">
+                <v-container class="justify-items-center d-flex flex-column ga-7">
                     <v-alert prominent :title="billTotalText" icon="mdi-calculator"
                         text="Use the Bill Breakdown view below to see how each utility contributes." type="info"
-                        class="w-75 mb-8"></v-alert>
+                        class="w-75 mx-auto mb-8"></v-alert>
 
                     <v-card border flat rounded class="w-100">
                         <v-card-item class="d-flex justify-center" prepend-icon="mdi-magnify">
@@ -277,14 +258,15 @@
                         </v-col>
                         <v-col cols="12" lg="4">
                             <v-card flat border rounded append-icon="mdi-open-in-new" class="mx-auto fill-height"
-                                href="https://github.com/vuetifyjs/vuetify/" prepend-icon="mdi-home-analytics" rel="noopener"
+                                href="https://github.com/vuetifyjs/vuetify/" prepend-icon="mdi-home-analytics"
+                                rel="noopener"
                                 text="Also from Electricities, this tool helps you look at the week ahead, considering factors like the weather and your thermostat settings."
                                 target="_blank" title="Energy Forecast"></v-card>
                         </v-col>
                         <v-col cols="12" lg="4">
                             <v-card flat border rounded append-icon="mdi-open-in-new" class="mx-auto  fill-height"
-                                href="https://github.com/vuetifyjs/vuetify/" prepend-icon="mdi-file-document-outline" rel="noopener"
-                                text="This Town of Apex page shares information about the transitional bills in July, August,
+                                href="https://github.com/vuetifyjs/vuetify/" prepend-icon="mdi-file-document-outline"
+                                rel="noopener" text="This Town of Apex page shares information about the transitional bills in July, August,
                                 and
                                 September
                                 of
